@@ -4,9 +4,11 @@ import {
   getCoreRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Media } from "../types/media";
 import { Box, Button, Card, Flex, Group, Modal, Paper, Pill, Rating, SimpleGrid, Stack, Table } from "@mantine/core";
 import { Link } from "react-router-dom";
@@ -15,6 +17,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { Filter } from "@components/table/Filter";
 import { isNullish } from "remeda";
 import classes from "./MediaTable.module.scss";
+import { TableHeader } from "@components/table/TableHeader";
 
 interface MediaTableProps {
   data: Media[];
@@ -23,34 +26,37 @@ interface MediaTableProps {
 export const MediaTable = ({ data }: MediaTableProps) => {
   const columnHelper = createColumnHelper<Media>();
   const [filterOpened, filterHandlers] = useDisclosure(false);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const tableColumns = useMemo(
     () => [
       columnHelper.accessor("title", {
         id: "Title",
-        header: () => "Title",
+        header: (ctx) => <TableHeader ctx={ctx} />,
       }),
       columnHelper.accessor("type", {
         id: "Media Type",
-        header: () => "Media Type",
+        header: (ctx) => <TableHeader ctx={ctx} />,
       }),
       columnHelper.accessor("status", {
         id: "Status",
-        header: () => "Status",
+        header: (ctx) => <TableHeader ctx={ctx} />,
       }),
       columnHelper.accessor("createdAt", {
         id: "Created At",
-        header: () => "Added On",
+        header: (ctx) => <TableHeader ctx={ctx} />,
         cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY"),
+        enableColumnFilter: false,
+        sortingFn: "datetime",
       }),
       columnHelper.accessor("rating", {
         id: "Rating",
-        header: () => "Rating",
+        header: (ctx) => <TableHeader ctx={ctx} />,
         cell: (info) => <Rating size="xs" value={info.getValue()} readOnly />,
       }),
       columnHelper.display({
         id: "Actions",
-        header: () => "Actions",
+        header: (ctx) => <TableHeader ctx={ctx} />,
         cell: (info) => {
           const { id } = info.row.original;
 
@@ -65,6 +71,8 @@ export const MediaTable = ({ data }: MediaTableProps) => {
             </Group>
           );
         },
+        enableSorting: false,
+        enableColumnFilter: false,
       }),
     ],
     [columnHelper]
@@ -89,20 +97,15 @@ export const MediaTable = ({ data }: MediaTableProps) => {
   const table = useReactTable({
     columns: tableColumns,
     data,
+    state: {
+      sorting,
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
   });
-
-  // if (table.getRowCount() === 0)
-  //   return (
-  //     <Stack justify="center" align="center">
-  //       <Text>Uh oh! Your list is empty. Wanna add a record?</Text>
-  //       <Button component={Link} to="/add">
-  //         Add Now!!!!
-  //       </Button>
-  //     </Stack>
-  //   );
 
   const getFilterValue = (val: unknown) => {
     return `${val}`;

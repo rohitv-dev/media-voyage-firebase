@@ -1,7 +1,6 @@
 export type MediaType = "Movie" | "Show" | "Game" | "Book";
 
 // TODO: No special characters in Genre, Platform
-// TODO: Completed Date is required if Status is completed
 
 export interface Media {
   id?: string;

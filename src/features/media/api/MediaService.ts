@@ -92,6 +92,8 @@ export const MediaService = {
 
   async deleteMedia(id: string): Promise<Result<boolean>> {
     try {
+      const res = await MediaService.getSingleMedia(id);
+      if (!res.ok) return { ok: false, message: res.message };
       await deleteDoc(doc(firestore, COLLECTIONS.MEDIA, id));
       return { ok: true, data: true };
     } catch (err) {

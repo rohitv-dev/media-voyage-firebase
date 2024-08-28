@@ -6,16 +6,15 @@ import {
   Group,
   Stack,
   Title,
-  Menu,
-  Divider,
   ActionIcon,
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
-import { IconChevronDown, IconLogout, IconMoon, IconSettings, IconSun, IconUser } from "@tabler/icons-react";
+import { IconMoon, IconSun } from "@tabler/icons-react";
 import { userLoader, userQuery } from "@features/authentication/routes/routes";
+import { HeaderDropdown } from "@components/navigation/HeaderDropdown";
 
 export const Layout = () => {
   const uid = useLoaderData() as Awaited<ReturnType<ReturnType<typeof userLoader>>>;
@@ -50,26 +49,7 @@ export const Layout = () => {
               {colorScheme === "dark" ? <IconSun /> : <IconMoon />}
             </ActionIcon>
 
-            <Menu position="bottom-end" width={200} closeOnItemClick={true}>
-              <Menu.Target>
-                <Button rightSection={<IconChevronDown />} variant="outline">
-                  {data.name}
-                </Button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>General</Menu.Label>
-                <Menu.Item disabled component={Link} leftSection={<IconSettings size={18} />} to="/">
-                  Settings
-                </Menu.Item>
-                <Menu.Item disabled component={Link} leftSection={<IconUser size={18} />} to="/">
-                  Profile
-                </Menu.Item>
-                <Divider size={1} mx="xs" />
-                <Menu.Item component={Link} leftSection={<IconLogout size={18} />} to="/logout" color="red">
-                  Logout
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
+            <HeaderDropdown name={data.name} />
           </Group>
         </Group>
       </AppShell.Header>
@@ -81,6 +61,9 @@ export const Layout = () => {
             </Button>
             <Button component={Link} to="/add" variant="light" onClick={toggle}>
               Add
+            </Button>
+            <Button variant="outline" onClick={toggleColorScheme}>
+              {colorScheme === "dark" ? "Light Mode" : "Dark Mode"}
             </Button>
           </Stack>
           <Button component={Link} to="/logout" variant="light" color="red" onClick={toggle}>

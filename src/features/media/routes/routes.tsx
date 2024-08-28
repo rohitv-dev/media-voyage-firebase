@@ -1,15 +1,15 @@
 import { json, LoaderFunctionArgs, RouteObject } from "react-router-dom";
 import { MediaPage } from "./MediaPage";
-import { MediaView } from "./MediaView";
 import { AddMediaView } from "./AddMediaView";
 import { UpdateMediaView } from "./UpdateMediaView";
 import { MediaService } from "../api/MediaService";
 import { QueryClient, queryOptions } from "@tanstack/react-query";
 import { Media } from "../types/media";
-import { filter, first, pipe } from "remeda";
+import { find } from "remeda";
 import { ErrorScreen } from "@components/ErrorScreen";
 import { ErrorInfo } from "@/types/api";
 import { userLoader } from "@features/authentication/routes/routes";
+import { MediaViewPage } from "./MediaViewPage";
 
 export const singleMediaQuery = (id: string) =>
   queryOptions({
@@ -17,10 +17,10 @@ export const singleMediaQuery = (id: string) =>
     queryFn: async () => {
       const res = await MediaService.getSingleMedia(id);
       if (!res.ok) {
-        throw new Response("", {
-          status: 404,
-          statusText: "Not Found",
-        });
+        throw json({
+          errorType: "Media Error",
+          description: "Media ID Not Found",
+        } as ErrorInfo);
       }
       return res.data;
     },
@@ -33,16 +33,13 @@ export const singleMediaLoader =
       throw new Error("Media ID Not Provided");
     }
     const media = queryClient.getQueryData<Media[]>(["media"]);
-    if (!media)
-      throw json({
-        errorType: "Media Error",
-        description: "Invalid Media ID",
-      } as ErrorInfo);
-    const selectedMedia = pipe(
-      media,
-      filter((m) => m.id === params.id),
-      first()
-    );
+
+    if (!media) {
+      await queryClient.ensureQueryData(singleMediaQuery(params.id));
+      return params.id;
+    }
+
+    const selectedMedia = find(media, (m) => m.id === params.id);
 
     if (!selectedMedia)
       throw json({
@@ -50,7 +47,9 @@ export const singleMediaLoader =
         description: "Media ID Not Found",
       } as ErrorInfo);
 
-    return selectedMedia;
+    await queryClient.setQueryData(["media", params.id], selectedMedia);
+
+    return params.id;
   };
 
 export const mediaLoader =
@@ -72,7 +71,7 @@ export const mediaRoutes = (queryClient: QueryClient): RouteObject[] => [
   {
     path: "view/:id",
     loader: singleMediaLoader(queryClient),
-    element: <MediaView />,
+    element: <MediaViewPage />,
     errorElement: <ErrorScreen />,
   },
   {

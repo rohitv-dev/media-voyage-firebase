@@ -10,8 +10,6 @@ interface FiltersProps<T> {
 }
 
 export function Filter<T>({ column, table }: FiltersProps<T>) {
-  if (column.id === "Actions") return null;
-
   const firstValue = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id);
   const columnFilterValue = column.getFilterValue();
 

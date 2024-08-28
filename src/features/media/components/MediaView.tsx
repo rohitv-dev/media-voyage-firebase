@@ -1,8 +1,5 @@
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
-import { singleMediaLoader } from "./routes";
-import { isBoolean, isDate, isNullish } from "remeda";
-import dayjs from "dayjs";
-import { Box, Button, Divider, Group, Modal, rem, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Link, useNavigate } from "react-router-dom";
+import { Box, Button, Card, Divider, Group, Modal, rem, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useEditor } from "@tiptap/react";
 import { RichTextEditor } from "@mantine/tiptap";
 import StarterKit from "@tiptap/starter-kit";
@@ -13,30 +10,12 @@ import { useDisclosure } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaService } from "../api/MediaService";
 import { showErrorNotification, showSuccessNotification } from "@utils/notifications";
+import { Media } from "../types/media";
+import { DataColumn } from "@components/DataColumn";
 
-const DataColumn = ({ title, value }: { title: string; value?: string | Date | boolean }) => {
-  if (isNullish(value)) return null;
-
-  const getValue = () => {
-    if (isDate(value)) return dayjs(value).format("DD/MM/YYYY");
-    if (isBoolean(value)) return value ? "Yes" : "No";
-    return value;
-  };
-
-  return (
-    <Stack gap="5px">
-      <Text fw="bold" fz={rem(16)}>
-        {title}
-      </Text>
-      <Text fz={rem(14)}>{getValue()}</Text>
-    </Stack>
-  );
-};
-
-export const MediaView = () => {
+export const MediaView = ({ media }: { media: Media }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const media = useLoaderData() as Awaited<ReturnType<ReturnType<typeof singleMediaLoader>>>;
   const [rating, setRating] = useState(0);
   const [deleteOpened, deleteHandlers] = useDisclosure(false);
 
@@ -44,6 +23,9 @@ export const MediaView = () => {
     mutationFn: MediaService.deleteMedia,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["media"] });
+    },
+    onError: (res) => {
+      showErrorNotification(res.message);
     },
   });
 
@@ -75,7 +57,7 @@ export const MediaView = () => {
   };
 
   return (
-    <Box>
+    <Card>
       <Stack gap="sm">
         {isError ? <Text>{error.message}</Text> : null}
         <Group justify="space-between">
@@ -132,6 +114,6 @@ export const MediaView = () => {
           </Group>
         </Stack>
       </Modal>
-    </Box>
+    </Card>
   );
 };
