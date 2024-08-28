@@ -1,0 +1,22 @@
+.header {
+  position: sticky;
+  top: 0;
+  background-color: var(--mantine-primary-color-filled);
+  color: white;
+}
+
+th {
+  &:first-child {
+    border-top-left-radius: 5px;
+  }
+
+  &:last-child {
+    border-top-right-radius: 5px;
+  }
+}
+
+.row {
+  @include dark {
+    background-color: var(--mantine-color-dark-6);
+  }
+}

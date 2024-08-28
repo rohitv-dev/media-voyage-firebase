@@ -1,0 +1,23 @@
+{
+  "projects": {
+    "media-voyage-dev": "media-voyage-dev",
+    "media-voyage": "media-voyage"
+  },
+  "targets": {
+    "media-voyage-dev": {
+      "hosting": {
+        "development": [
+          "media-voyage-dev"
+        ]
+      }
+    },
+    "media-voyage": {
+      "hosting": {
+        "prod": [
+          "media-voyage"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
