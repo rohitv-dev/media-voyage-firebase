@@ -1,10 +1,10 @@
 import { Media } from "@features/media/types/media";
-import { Menu, Button, Stack } from "@mantine/core";
+import { Menu, Button, Stack, Center } from "@mantine/core";
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconChevronUp, IconX } from "@tabler/icons-react";
 import { HeaderContext } from "@tanstack/react-table";
 
 export const TableHeader = ({ ctx }: { ctx: HeaderContext<Media, unknown> }) => {
-  if (!ctx.column.getCanSort()) return ctx.column.id;
+  if (!ctx.column.getCanSort()) return <Center>{ctx.column.id}</Center>;
 
   return (
     <Menu>

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Box, Button, Card, Divider, Group, Modal, rem, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Button, Card, Divider, Group, Modal, rem, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useEditor } from "@tiptap/react";
 import { RichTextEditor } from "@mantine/tiptap";
 import StarterKit from "@tiptap/starter-kit";
@@ -12,6 +12,7 @@ import { MediaService } from "../api/MediaService";
 import { showErrorNotification, showSuccessNotification } from "@utils/notifications";
 import { Media } from "../types/media";
 import { DataColumn } from "@components/DataColumn";
+import { toUpperCase } from "remeda";
 
 export const MediaView = ({ media }: { media: Media }) => {
   const navigate = useNavigate();
@@ -103,7 +104,12 @@ export const MediaView = ({ media }: { media: Media }) => {
       </Stack>
       <Modal opened={deleteOpened} onClose={deleteHandlers.close} title={`Delete ${media.title}?`}>
         <Stack>
-          <Text>Are you sure you want to delete the selected media?</Text>
+          <Stack gap="xs">
+            <Text>Are you sure you want to delete...</Text>
+            <Text fw="bold" fz="lg">
+              {toUpperCase(media.title)}?!
+            </Text>
+          </Stack>
           <Group justify="right">
             <Button loading={isPending} onClick={deleteHandlers.close}>
               No

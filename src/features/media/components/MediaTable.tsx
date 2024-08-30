@@ -10,7 +10,21 @@ import {
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { Media } from "../types/media";
-import { Box, Button, Card, Flex, Group, Modal, Paper, Pill, Rating, SimpleGrid, Stack, Table } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Group,
+  Modal,
+  Paper,
+  Pill,
+  Rating,
+  SimpleGrid,
+  Stack,
+  Table,
+  TextInput,
+} from "@mantine/core";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { useDisclosure } from "@mantine/hooks";
@@ -18,6 +32,7 @@ import { Filter } from "@components/table/Filter";
 import { isNullish } from "remeda";
 import classes from "./MediaTable.module.scss";
 import { TableHeader } from "@components/table/TableHeader";
+import { IconSearch } from "@tabler/icons-react";
 
 interface MediaTableProps {
   data: Media[];
@@ -27,6 +42,7 @@ export const MediaTable = ({ data }: MediaTableProps) => {
   const columnHelper = createColumnHelper<Media>();
   const [filterOpened, filterHandlers] = useDisclosure(false);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const tableColumns = useMemo(
     () => [
@@ -43,16 +59,18 @@ export const MediaTable = ({ data }: MediaTableProps) => {
         header: (ctx) => <TableHeader ctx={ctx} />,
       }),
       columnHelper.accessor("createdAt", {
-        id: "Created At",
+        id: "Added On",
         header: (ctx) => <TableHeader ctx={ctx} />,
         cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY"),
         enableColumnFilter: false,
+        enableGlobalFilter: false,
         sortingFn: "datetime",
       }),
       columnHelper.accessor("rating", {
         id: "Rating",
         header: (ctx) => <TableHeader ctx={ctx} />,
         cell: (info) => <Rating size="xs" value={info.getValue()} readOnly />,
+        enableGlobalFilter: false,
       }),
       columnHelper.display({
         id: "Actions",
@@ -61,7 +79,7 @@ export const MediaTable = ({ data }: MediaTableProps) => {
           const { id } = info.row.original;
 
           return (
-            <Group>
+            <Group grow>
               <Button component={Link} to={`view/${id}`} size="xs" variant="light">
                 View
               </Button>
@@ -78,33 +96,20 @@ export const MediaTable = ({ data }: MediaTableProps) => {
     [columnHelper]
   );
 
-  // const cardColumns = useMemo(
-  //   () => [
-  //     columnHelper.display({
-  //       id: "Title",
-  //       header: () => "Title",
-  //       cell: (info) => (
-  //         <Group>
-  //           <Text>{info.row.original.title}</Text>
-  //           <Rating readOnly value={info.row.original.rating} />
-  //         </Group>
-  //       ),
-  //     }),
-  //   ],
-  //   [columnHelper]
-  // );
-
   const table = useReactTable({
     columns: tableColumns,
     data,
     state: {
       sorting,
+      globalFilter,
     },
+    globalFilterFn: "includesString",
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
   });
 
   const getFilterValue = (val: unknown) => {
@@ -132,7 +137,16 @@ export const MediaTable = ({ data }: MediaTableProps) => {
           }
         })}
       </Flex>
-      <Group justify="right">
+      <Group justify="space-between">
+        <TextInput
+          leftSection={<IconSearch size={18} />}
+          placeholder="Search"
+          size="xs"
+          value={globalFilter}
+          onChange={(e) => {
+            setGlobalFilter(String(e.target.value));
+          }}
+        />
         <Button variant="outline" size="xs" onClick={filterHandlers.open}>
           Filters
         </Button>
@@ -142,7 +156,7 @@ export const MediaTable = ({ data }: MediaTableProps) => {
           <Card key={row.id} shadow="md" radius="md">
             <Stack gap="xs">
               {row.getVisibleCells().map((cell) => (
-                <Group key={cell.id}>
+                <Group key={cell.id} grow>
                   <Box>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Box>
                 </Group>
               ))}
