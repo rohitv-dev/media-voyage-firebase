@@ -13,11 +13,12 @@
     },
     "media-voyage": {
       "hosting": {
-        "prod": [
+        "production": [
           "media-voyage"
         ]
       }
     }
   },
-  "etags": {}
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }

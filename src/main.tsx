@@ -7,7 +7,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./layouts/Layout.tsx";
 import { mediaRoutes } from "@features/media/routes/routes.tsx";
-import { authRoutes, userLoader } from "@features/authentication/routes/routes.tsx";
+import { authRoutes, profileRoute, userLoader } from "@features/authentication/routes/routes.tsx";
 import { ProtectedRoute } from "@components/ProtectedRoute.tsx";
 
 import "@mantine/core/styles.css";
@@ -36,7 +36,7 @@ const router = createBrowserRouter([
         path: "",
         element: <Layout />,
         loader: userLoader(queryClient),
-        children: [...mediaRoutes(queryClient)],
+        children: [...mediaRoutes(queryClient), profileRoute(queryClient)],
       },
     ],
   },

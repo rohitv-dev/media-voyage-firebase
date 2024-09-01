@@ -26,13 +26,13 @@ import {
   TextInput,
 } from "@mantine/core";
 import { Link } from "react-router-dom";
-import dayjs from "dayjs";
 import { useDisclosure } from "@mantine/hooks";
 import { Filter } from "@components/table/Filter";
 import { isNullish } from "remeda";
 import classes from "./MediaTable.module.scss";
 import { TableHeader } from "@components/table/TableHeader";
 import { IconSearch } from "@tabler/icons-react";
+import { formatDate } from "@utils/functions";
 
 interface MediaTableProps {
   data: Media[];
@@ -61,7 +61,7 @@ export const MediaTable = ({ data }: MediaTableProps) => {
       columnHelper.accessor("createdAt", {
         id: "Added On",
         header: (ctx) => <TableHeader ctx={ctx} />,
-        cell: (info) => dayjs(info.getValue()).format("DD/MM/YYYY"),
+        cell: (info) => formatDate(info.getValue()),
         enableColumnFilter: false,
         enableGlobalFilter: false,
         sortingFn: "datetime",
@@ -151,6 +151,7 @@ export const MediaTable = ({ data }: MediaTableProps) => {
           Filters
         </Button>
       </Group>
+
       <Stack hiddenFrom="sm">
         {table.getRowModel().rows.map((row) => (
           <Card key={row.id} shadow="md" radius="md">

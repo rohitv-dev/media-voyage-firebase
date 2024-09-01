@@ -12,7 +12,7 @@
       ]
     },
     {
-      "target": "prod",
+      "target": "production",
       "public": "dist/production",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [

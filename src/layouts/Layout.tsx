@@ -17,13 +17,13 @@ import { userLoader, userQuery } from "@features/authentication/routes/routes";
 import { HeaderDropdown } from "@components/navigation/HeaderDropdown";
 
 export const Layout = () => {
-  const uid = useLoaderData() as Awaited<ReturnType<ReturnType<typeof userLoader>>>;
+  const id = useLoaderData() as Awaited<ReturnType<ReturnType<typeof userLoader>>>;
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure();
 
-  const { data } = useSuspenseQuery(userQuery(typeof uid === "string" ? uid : ""));
+  const { data } = useSuspenseQuery(userQuery(id));
 
   return (
     <AppShell

@@ -1,7 +1,7 @@
 import { Card, Stack, Group, Rating, Button, Text, DefaultMantineColor, StyleProp } from "@mantine/core";
-import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { Media } from "../types/media";
+import { formatDate } from "@utils/functions";
 
 export const MediaCard = ({ media }: { media: Media }) => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export const MediaCard = ({ media }: { media: Media }) => {
         <Text fw="600">{media.status}</Text>
         <Group>
           <Text fw="600">Added On: </Text>
-          {<Text>{dayjs(media.createdAt).format("DD/MM/YYYY")}</Text>}
+          {<Text>{formatDate(media.createdAt)}</Text>}
         </Group>
         <Group>
           <Button

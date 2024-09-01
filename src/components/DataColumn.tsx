@@ -1,12 +1,12 @@
 import { Stack, Text, rem } from "@mantine/core";
-import dayjs from "dayjs";
+import { formatDate } from "@utils/functions";
 import { isNullish, isDate, isBoolean } from "remeda";
 
 export const DataColumn = ({ title, value }: { title: string; value?: string | Date | boolean }) => {
   if (isNullish(value)) return null;
 
   const getValue = () => {
-    if (isDate(value)) return dayjs(value).format("DD/MM/YYYY");
+    if (isDate(value)) return formatDate(value);
     if (isBoolean(value)) return value ? "Yes" : "No";
     return value;
   };

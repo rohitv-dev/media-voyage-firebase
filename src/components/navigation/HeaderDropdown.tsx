@@ -15,7 +15,7 @@ export const HeaderDropdown = ({ name }: { name: string }) => {
         <Menu.Item disabled component={Link} leftSection={<IconSettings size={18} />} to="/">
           Settings
         </Menu.Item>
-        <Menu.Item disabled component={Link} leftSection={<IconUser size={18} />} to="/">
+        <Menu.Item component={Link} leftSection={<IconUser size={18} />} to="/profile">
           Profile
         </Menu.Item>
         <Divider size={1} mx="xs" />

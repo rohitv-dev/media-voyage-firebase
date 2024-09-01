@@ -1,10 +1,11 @@
-import { redirect, RouteObject } from "react-router-dom";
+import { RouteObject } from "react-router-dom";
 import { LoginPage } from "./LoginPage";
 import { RegisterPage } from "./RegisterPage";
 import { LogoutPage } from "./LogoutPage";
 import { auth } from "@/services/firebase";
 import { queryOptions, QueryClient } from "@tanstack/react-query";
 import { UserService } from "../api/UserService";
+import { ProfilePage } from "./ProfilePage";
 
 export const userQuery = (uid: string) =>
   queryOptions({
@@ -27,9 +28,7 @@ export const userLoader = (queryClient: QueryClient) => async () => {
   if (auth.currentUser) {
     await queryClient.ensureQueryData(userQuery(auth.currentUser.uid));
     return auth.currentUser.uid;
-  } else {
-    return redirect("login");
-  }
+  } else throw new Error("User ID not found");
 };
 
 export const authRoutes = (): RouteObject[] => [
@@ -46,3 +45,9 @@ export const authRoutes = (): RouteObject[] => [
     element: <LogoutPage />,
   },
 ];
+
+export const profileRoute = (queryClient: QueryClient): RouteObject => ({
+  path: "profile",
+  loader: userLoader(queryClient),
+  element: <ProfilePage />,
+});
