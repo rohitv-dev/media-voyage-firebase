@@ -4,12 +4,12 @@ import { Container } from "@mantine/core";
 import { Media } from "../types/media";
 import { MediaTable } from "../components/MediaTable";
 import { LoadingScreen } from "@components/LoadingScreen";
-import { useLoaderData } from "react-router-dom";
-import { userLoader } from "@features/authentication/routes/routes";
+import { useRouteLoaderData } from "react-router-dom";
+import { UserLoader } from "@features/authentication/routes/routes";
 import { ErrorScreen } from "@components/ErrorScreen";
 
 export const MediaPage = () => {
-  const uid = useLoaderData() as Awaited<ReturnType<ReturnType<typeof userLoader>>>;
+  const uid = useRouteLoaderData("root") as UserLoader;
 
   const { data, isPending, isError, error } = useQuery<Media[]>({
     queryKey: ["media"],

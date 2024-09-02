@@ -11,11 +11,13 @@ import {
 import { useMemo, useState } from "react";
 import { Media } from "../types/media";
 import {
+  ActionIcon,
   Box,
   Button,
   Card,
   Flex,
   Group,
+  Menu,
   Modal,
   Paper,
   Pill,
@@ -25,13 +27,13 @@ import {
   Table,
   TextInput,
 } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { Filter } from "@components/table/Filter";
 import { isNullish } from "remeda";
 import classes from "./MediaTable.module.scss";
 import { TableHeader } from "@components/table/TableHeader";
-import { IconSearch } from "@tabler/icons-react";
+import { IconDotsVertical, IconSearch } from "@tabler/icons-react";
 import { formatDate } from "@utils/functions";
 
 interface MediaTableProps {
@@ -39,6 +41,7 @@ interface MediaTableProps {
 }
 
 export const MediaTable = ({ data }: MediaTableProps) => {
+  const navigate = useNavigate();
   const columnHelper = createColumnHelper<Media>();
   const [filterOpened, filterHandlers] = useDisclosure(false);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -74,19 +77,54 @@ export const MediaTable = ({ data }: MediaTableProps) => {
       }),
       columnHelper.display({
         id: "Actions",
-        header: (ctx) => <TableHeader ctx={ctx} />,
+        header: () => null,
         cell: (info) => {
           const { id } = info.row.original;
 
           return (
-            <Group grow>
-              <Button component={Link} to={`view/${id}`} size="xs" variant="light">
-                View
-              </Button>
-              <Button component={Link} to={`update/${id}`} size="xs" variant="light">
-                Update
-              </Button>
-            </Group>
+            <Box>
+              <Menu>
+                <Menu.Target>
+                  <ActionIcon
+                    variant="transparent"
+                    visibleFrom="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <IconDotsVertical stroke={1} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    component={Link}
+                    to={`view/${id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    View
+                  </Menu.Item>
+                  <Menu.Item
+                    component={Link}
+                    to={`update/${id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    Update
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+              <Group grow hiddenFrom="sm">
+                <Button component={Link} to={`view/${id}`} size="xs" variant="light">
+                  View
+                </Button>
+                <Button component={Link} to={`update/${id}`} size="xs" variant="light">
+                  Update
+                </Button>
+              </Group>
+            </Box>
           );
         },
         enableSorting: false,
@@ -182,7 +220,13 @@ export const MediaTable = ({ data }: MediaTableProps) => {
             </Table.Thead>
             <Table.Tbody>
               {table.getRowModel().rows.map((row) => (
-                <Table.Tr key={row.id} className={classes.row}>
+                <Table.Tr
+                  key={row.id}
+                  className={classes.row}
+                  onClick={() => {
+                    navigate(`view/${row.original.id}`);
+                  }}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <Table.Td key={cell.id} data-heading={cell.column.id !== "Actions" ? cell.column.id : undefined}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

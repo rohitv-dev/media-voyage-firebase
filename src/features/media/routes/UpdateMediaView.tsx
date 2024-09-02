@@ -1,10 +1,10 @@
 import { useLoaderData } from "react-router-dom";
-import { singleMediaLoader, singleMediaQuery } from "./routes";
+import { SingleMediaLoader, singleMediaQuery } from "./routes";
 import { UpdateMediaForm } from "../forms/UpdateMediaForm";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const UpdateMediaView = () => {
-  const id = useLoaderData() as Awaited<ReturnType<ReturnType<typeof singleMediaLoader>>>;
+  const id = useLoaderData() as SingleMediaLoader;
 
   const { data: media } = useSuspenseQuery(singleMediaQuery(id));
 

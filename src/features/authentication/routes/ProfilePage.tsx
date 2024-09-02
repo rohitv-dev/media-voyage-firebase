@@ -1,13 +1,14 @@
-import { useLoaderData } from "react-router-dom";
-import { userLoader, userQuery } from "./routes";
+import { useRouteLoaderData } from "react-router-dom";
+import { UserLoader, userQuery } from "./routes";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Avatar, Card, Center, Stack, Text } from "@mantine/core";
 import { formatDate } from "@utils/functions";
+import { isString } from "remeda";
 
 export const ProfilePage = () => {
-  const id = useLoaderData() as Awaited<ReturnType<ReturnType<typeof userLoader>>>;
+  const id = useRouteLoaderData("root") as UserLoader;
 
-  const { data: user } = useSuspenseQuery(userQuery(id));
+  const { data: user } = useSuspenseQuery(userQuery(isString(id) ? id : ""));
 
   return (
     <Center>

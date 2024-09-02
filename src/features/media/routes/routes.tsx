@@ -8,8 +8,10 @@ import { Media } from "../types/media";
 import { find } from "remeda";
 import { ErrorScreen } from "@components/ErrorScreen";
 import { ErrorInfo } from "@/types/api";
-import { userLoader } from "@features/authentication/routes/routes";
 import { MediaViewPage } from "./MediaViewPage";
+
+export type MediaLoader = Awaited<ReturnType<ReturnType<typeof mediaLoader>>>;
+export type SingleMediaLoader = Awaited<ReturnType<ReturnType<typeof singleMediaLoader>>>;
 
 export const singleMediaQuery = (id: string) =>
   queryOptions({
@@ -65,7 +67,6 @@ export const mediaLoader =
 export const mediaRoutes = (queryClient: QueryClient): RouteObject[] => [
   {
     path: "",
-    loader: userLoader(queryClient),
     element: <MediaPage />,
   },
   {

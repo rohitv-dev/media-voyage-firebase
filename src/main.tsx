@@ -34,9 +34,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
+        id: "root",
         element: <Layout />,
         loader: userLoader(queryClient),
-        children: [...mediaRoutes(queryClient), profileRoute(queryClient)],
+        children: [...mediaRoutes(queryClient), profileRoute],
       },
     ],
   },

@@ -13,17 +13,18 @@ import { useDisclosure } from "@mantine/hooks";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { IconMoon, IconSun } from "@tabler/icons-react";
-import { userLoader, userQuery } from "@features/authentication/routes/routes";
+import { UserLoader, userQuery } from "@features/authentication/routes/routes";
 import { HeaderDropdown } from "@components/navigation/HeaderDropdown";
+import { isString } from "remeda";
 
 export const Layout = () => {
-  const id = useLoaderData() as Awaited<ReturnType<ReturnType<typeof userLoader>>>;
+  const id = useLoaderData() as UserLoader;
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure();
 
-  const { data } = useSuspenseQuery(userQuery(id));
+  const { data } = useSuspenseQuery(userQuery(isString(id) ? id : ""));
 
   return (
     <AppShell
