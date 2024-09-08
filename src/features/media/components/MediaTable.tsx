@@ -9,12 +9,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
-import { Media } from "../types/media";
+import { Media, MediaStatus } from "../types/media";
 import {
   ActionIcon,
   Box,
   Button,
   Card,
+  DefaultMantineColor,
   Flex,
   Group,
   Menu,
@@ -24,7 +25,9 @@ import {
   Rating,
   SimpleGrid,
   Stack,
+  StyleProp,
   Table,
+  Text,
   TextInput,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
@@ -52,6 +55,16 @@ export const MediaTable = ({ data }: MediaTableProps) => {
       columnHelper.accessor("title", {
         id: "Title",
         header: (ctx) => <TableHeader ctx={ctx} />,
+        cell: (info) => {
+          return (
+            <Box>
+              <Box visibleFrom="sm">{info.getValue()}</Box>
+              <Box hiddenFrom="sm">
+                <Text fw="bold">{info.getValue()}</Text>
+              </Box>
+            </Box>
+          );
+        },
       }),
       columnHelper.accessor("type", {
         id: "Media Type",
@@ -60,11 +73,34 @@ export const MediaTable = ({ data }: MediaTableProps) => {
       columnHelper.accessor("status", {
         id: "Status",
         header: (ctx) => <TableHeader ctx={ctx} />,
+        cell: (info) => {
+          const colors: Record<MediaStatus, StyleProp<DefaultMantineColor>> = {
+            Completed: "teal",
+            "In Progress": "yellow",
+            Planned: "grape",
+          };
+
+          return (
+            <Pill bg={colors[info.getValue() as MediaStatus]} c="white" fw="bold">
+              {info.getValue()}
+            </Pill>
+          );
+        },
       }),
       columnHelper.accessor("createdAt", {
         id: "Added On",
         header: (ctx) => <TableHeader ctx={ctx} />,
-        cell: (info) => formatDate(info.getValue()),
+        cell: (info) => {
+          return (
+            <Box>
+              <Box visibleFrom="sm">{formatDate(info.getValue())}</Box>
+              <Group hiddenFrom="sm" gap="xs">
+                <Text>Added On: </Text>
+                <Text>{formatDate(info.getValue())}</Text>
+              </Group>
+            </Box>
+          );
+        },
         enableColumnFilter: false,
         enableGlobalFilter: false,
         sortingFn: "datetime",
@@ -193,7 +229,7 @@ export const MediaTable = ({ data }: MediaTableProps) => {
       <Stack hiddenFrom="sm">
         {table.getRowModel().rows.map((row) => (
           <Card key={row.id} shadow="md" radius="md">
-            <Stack gap="xs">
+            <Stack gap="8px">
               {row.getVisibleCells().map((cell) => (
                 <Group key={cell.id} grow>
                   <Box>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Box>

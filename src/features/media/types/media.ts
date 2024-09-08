@@ -1,4 +1,10 @@
-export type MediaType = "Movie" | "Show" | "Game" | "Book";
+import { z } from "zod";
+
+export const MediaStatusEnum = z.enum(["Completed", "In Progress", "Planned"]);
+export type MediaStatus = z.infer<typeof MediaStatusEnum>;
+
+export const MediaTypeEnum = z.enum(["Movie", "Show", "Game", "Book"]);
+export type MediaType = z.infer<typeof MediaTypeEnum>;
 
 // TODO: No special characters in Genre, Platform
 
@@ -12,10 +18,10 @@ export interface Media {
   tags: string[];
   comments?: string;
   rating: number;
-  type: string;
+  type: MediaType;
   platform?: string;
   recommended?: string;
-  status: string;
+  status: MediaStatus;
   uid?: string;
   genre?: string;
 }

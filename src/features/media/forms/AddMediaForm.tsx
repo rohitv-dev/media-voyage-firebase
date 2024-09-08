@@ -3,7 +3,7 @@ import { DateInput } from "@mantine/dates";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaService } from "../api/MediaService";
 import { useForm, zodResolver } from "@mantine/form";
-import { Media } from "../types/media";
+import { Media, MediaStatusEnum, MediaTypeEnum } from "../types/media";
 import { useNavigate } from "react-router-dom";
 import { CommentsEditor } from "../components/CommentsEditor";
 import { useInputState } from "@mantine/hooks";
@@ -81,7 +81,7 @@ export const AddMediaForm = () => {
           <Select
             label="Media Type"
             placeholder="Select Media Type"
-            data={["Movie", "Show", "Game", "Book"]}
+            data={MediaTypeEnum.options}
             {...form.getInputProps("type")}
           />
           <TextInput label="Genre" placeholder="Enter the genre" {...form.getInputProps("genre")} />
@@ -104,7 +104,7 @@ export const AddMediaForm = () => {
           withAsterisk
           label="Status"
           placeholder="Status"
-          data={["Completed", "In Progress", "Planned"]}
+          data={MediaStatusEnum.options}
           {...form.getInputProps("status")}
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }}>

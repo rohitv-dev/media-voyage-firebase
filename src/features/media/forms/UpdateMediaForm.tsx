@@ -6,7 +6,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
 import { CommentsEditor } from "../components/CommentsEditor";
 import { useInputState } from "@mantine/hooks";
-import { Media } from "../types/media";
+import { Media, MediaStatusEnum, MediaTypeEnum } from "../types/media";
 import { mediaSchema } from "../utils/schema";
 import { showErrorNotification, showSuccessNotification } from "@utils/notifications";
 import { findIndex } from "remeda";
@@ -20,6 +20,20 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
   const form = useForm<Media>({
     initialValues: structuredClone(media),
     validate: zodResolver(mediaSchema),
+    enhanceGetInputProps: (payload) => {
+      const { status } = payload.form.values;
+
+      if (payload.field === "completedDate") {
+        if (status === "Completed")
+          return {
+            withAsterisk: true,
+          };
+
+        return {
+          withAsterisk: false,
+        };
+      }
+    },
   });
 
   const { mutateAsync, isPending, isError, error } = useMutation({
@@ -58,7 +72,7 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
           <Select
             label="Media Type"
             placeholder="Select Media Type"
-            data={["Movie", "Show", "Game", "Book"]}
+            data={MediaTypeEnum.options}
             {...form.getInputProps("type")}
           />
           <TextInput label="Genre" placeholder="Enter the genre" {...form.getInputProps("genre")} />
@@ -81,7 +95,7 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
           withAsterisk
           label="Status"
           placeholder="Status"
-          data={["Completed", "In Progress", "Planned"]}
+          data={MediaStatusEnum.options}
           {...form.getInputProps("status")}
         />
         <SimpleGrid cols={{ base: 1, sm: 2 }}>

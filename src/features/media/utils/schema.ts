@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MediaStatusEnum, MediaTypeEnum } from "../types/media";
 
 export const mediaSchema = z.object({
   id: z.string().optional(),
@@ -10,8 +11,8 @@ export const mediaSchema = z.object({
   tags: z.array(z.string()),
   comments: z.string().optional(),
   rating: z.number(),
-  type: z.string(),
+  type: MediaTypeEnum,
   platform: z.string().optional(),
   recommended: z.string().optional(),
-  status: z.string(),
+  status: MediaStatusEnum,
 });

@@ -11,15 +11,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mantine/core": "^7.12.1",
-    "@mantine/dates": "^7.12.1",
-    "@mantine/form": "^7.12.1",
-    "@mantine/hooks": "^7.12.1",
-    "@mantine/notifications": "^7.12.1",
-    "@mantine/tiptap": "^7.12.1",
+    "@mantine/core": "^7.12.2",
+    "@mantine/dates": "^7.12.2",
+    "@mantine/form": "^7.12.2",
+    "@mantine/hooks": "^7.12.2",
+    "@mantine/notifications": "^7.12.2",
+    "@mantine/tiptap": "^7.12.2",
     "@tabler/icons-react": "^3.14.0",
-    "@tanstack/react-query": "^5.52.3",
-    "@tanstack/react-query-devtools": "^5.52.3",
+    "@tanstack/react-query": "^5.55.0",
+    "@tanstack/react-query-devtools": "^5.55.0",
     "@tanstack/react-table": "^8.20.5",
     "@tiptap/extension-highlight": "^2.6.6",
     "@tiptap/extension-link": "^2.6.6",
@@ -32,12 +32,12 @@
     "@tiptap/starter-kit": "^2.6.6",
     "dayjs": "^1.11.13",
     "firebase": "^10.13.1",
-    "framer-motion": "^11.3.31",
+    "framer-motion": "^11.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
-    "remeda": "^2.11.0",
-    "sass": "^1.77.8",
+    "remeda": "^2.12.0",
+    "sass": "^1.78.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -51,6 +51,6 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.11",
     "typescript": "^5.5.4",
-    "vite": "^5.4.2"
+    "vite": "^5.4.3"
   }
 }

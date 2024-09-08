@@ -63,6 +63,9 @@ export const Layout = () => {
             <Button component={Link} to="/add" variant="light" onClick={toggle}>
               Add
             </Button>
+            <Button component={Link} to="/profile" variant="light" onClick={toggle}>
+              Profile
+            </Button>
             <Button variant="outline" onClick={toggleColorScheme}>
               {colorScheme === "dark" ? "Light Mode" : "Dark Mode"}
             </Button>

@@ -1,4 +1,4 @@
-import { Select } from "@mantine/core";
+import { Select, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { Column, Table } from "@tanstack/react-table";
 import { useMemo } from "react";
@@ -26,7 +26,7 @@ export function Filter<T>({ column, table }: FiltersProps<T>) {
     return <DatePickerInput placeholder={column.id} onChange={(val) => column.setFilterValue(val)} />;
   }
 
-  if (isString(firstValue)) {
+  if (isString(firstValue) && sortedUniqueValues.length <= 10) {
     return (
       <Select
         clearable
@@ -39,6 +39,18 @@ export function Filter<T>({ column, table }: FiltersProps<T>) {
         onChange={(val) => {
           if (val) column.setFilterValue(val);
           else column.setFilterValue(null);
+        }}
+      />
+    );
+  }
+
+  if (isString(firstValue) && sortedUniqueValues.length > 10) {
+    return (
+      <TextInput
+        placeholder={column.id}
+        value={(columnFilterValue ?? "") as string}
+        onChange={(e) => {
+          column.setFilterValue(String(e.target.value));
         }}
       />
     );
