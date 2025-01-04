@@ -48,7 +48,7 @@ export const authRoutes = (): RouteObject[] => [
   },
 ];
 
-export const profileRoute: RouteObject = {
+export const profileRoute = (): RouteObject => ({
   path: "profile",
   element: <ProfilePage />,
-};
+});

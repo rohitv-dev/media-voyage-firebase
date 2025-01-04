@@ -1,26 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { MediaService } from "../api/MediaService";
 import { Container } from "@mantine/core";
-import { Media } from "../types/media";
 import { MediaTable } from "../components/MediaTable";
 import { LoadingScreen } from "@components/LoadingScreen";
 import { useRouteLoaderData } from "react-router-dom";
 import { UserLoader } from "@features/authentication/routes/routes";
 import { ErrorScreen } from "@components/ErrorScreen";
+import { mediaQuery } from "../api/queries";
 
 export const MediaPage = () => {
   const uid = useRouteLoaderData("root") as UserLoader;
 
-  const { data, isPending, isError, error } = useQuery<Media[]>({
-    queryKey: ["media"],
-    queryFn: async () => {
-      const res = await MediaService.getMedia(typeof uid === "string" ? uid : "");
-      if (!res.ok) {
-        throw new Error(res.message);
-      }
-      return res.data;
-    },
-  });
+  const { data, isPending, isError, error } = useQuery(mediaQuery(String(uid)));
 
   if (isPending) return <LoadingScreen />;
   if (isError) return <ErrorScreen message={error.message} />;

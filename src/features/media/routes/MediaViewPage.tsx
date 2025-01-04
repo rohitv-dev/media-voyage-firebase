@@ -1,7 +1,8 @@
 import { useLoaderData } from "react-router-dom";
-import { SingleMediaLoader, singleMediaQuery } from "./routes";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { MediaView } from "../components/MediaView";
+import { singleMediaQuery } from "../api/queries";
+import { SingleMediaLoader } from "../api/loaders";
 
 export const MediaViewPage = () => {
   const id = useLoaderData() as SingleMediaLoader;

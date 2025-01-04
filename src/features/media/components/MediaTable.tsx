@@ -41,9 +41,10 @@ import { formatDate } from "@utils/functions";
 
 interface MediaTableProps {
   data: Media[];
+  viewOnly?: boolean;
 }
 
-export const MediaTable = ({ data }: MediaTableProps) => {
+export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
   const navigate = useNavigate();
   const columnHelper = createColumnHelper<Media>();
   const [filterOpened, filterHandlers] = useDisclosure(false);
@@ -141,15 +142,17 @@ export const MediaTable = ({ data }: MediaTableProps) => {
                   >
                     View
                   </Menu.Item>
-                  <Menu.Item
-                    component={Link}
-                    to={`update/${id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    Update
-                  </Menu.Item>
+                  {!viewOnly && (
+                    <Menu.Item
+                      component={Link}
+                      to={`update/${id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      Update
+                    </Menu.Item>
+                  )}
                 </Menu.Dropdown>
               </Menu>
               <Group grow hiddenFrom="sm">
@@ -167,7 +170,7 @@ export const MediaTable = ({ data }: MediaTableProps) => {
         enableColumnFilter: false,
       }),
     ],
-    [columnHelper]
+    [columnHelper, viewOnly]
   );
 
   const table = useReactTable({

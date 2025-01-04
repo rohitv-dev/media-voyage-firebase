@@ -9,6 +9,7 @@ import { Layout } from "./layouts/Layout.tsx";
 import { mediaRoutes } from "@features/media/routes/routes.tsx";
 import { authRoutes, profileRoute, userLoader } from "@features/authentication/routes/routes.tsx";
 import { ProtectedRoute } from "@components/ProtectedRoute.tsx";
+import { friendMediaRoutes } from "@features/friends/routes/routes.tsx";
 
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
@@ -37,7 +38,11 @@ const router = createBrowserRouter([
         id: "root",
         element: <Layout />,
         loader: userLoader(queryClient),
-        children: [...mediaRoutes(queryClient), profileRoute],
+        children: [
+          ...mediaRoutes(queryClient),
+          profileRoute(),
+          { path: "friend", children: friendMediaRoutes(queryClient) },
+        ],
       },
     ],
   },

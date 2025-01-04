@@ -2,13 +2,10 @@ import {
   collection,
   deleteDoc,
   doc,
-  DocumentData,
-  FirestoreDataConverter,
   getDoc,
   getDocs,
   orderBy,
   query,
-  QueryDocumentSnapshot,
   setDoc,
   updateDoc,
   where,
@@ -20,18 +17,37 @@ import { Result } from "@/types/api";
 import { parseMedia } from "../utils/converters";
 import { Media } from "../types/media";
 import { handleEmptyResult, handleResultError } from "@utils/functions";
-
-const mediaConverter = <T extends DocumentData>(): FirestoreDataConverter<T> => ({
-  toFirestore: (data: T) => data,
-  fromFirestore: (snap: QueryDocumentSnapshot<T>): T => snap.data(),
-});
+import { FriendsService } from "@features/friends/api/FriendsService";
+import { firebaseConverter } from "../utils/firebaseConverters";
 
 export const MediaService = {
   async getSingleMedia(id: string): Promise<Result<Media>> {
     try {
-      const snap = await getDoc(doc(firestore, COLLECTIONS.MEDIA, id).withConverter(mediaConverter<Media>()));
+      const snap = await getDoc(doc(firestore, COLLECTIONS.MEDIA, id).withConverter(firebaseConverter<Media>()));
       if (snap.exists()) return { ok: true, data: parseMedia(snap.data()) };
       return { ok: false, message: "Media Not Found" };
+    } catch (err) {
+      return handleResultError(err);
+    }
+  },
+
+  async getFriendMedia(curUid: string, friendUid: string): Promise<Result<Media[]>> {
+    try {
+      const res = await FriendsService.isFriend(curUid, friendUid);
+
+      if (!res.ok) return { ok: false, message: res.message };
+
+      const q = query(
+        collection(firestore, COLLECTIONS.MEDIA),
+        where("uid", "==", friendUid),
+        orderBy("createdAt", "desc")
+      ).withConverter(firebaseConverter<Media>());
+
+      const snap = await getDocs(q);
+
+      const data = snap.docs.map((doc) => parseMedia({ ...doc.data(), id: doc.id }));
+
+      return { ok: true, data };
     } catch (err) {
       return handleResultError(err);
     }
@@ -43,7 +59,7 @@ export const MediaService = {
         collection(firestore, COLLECTIONS.MEDIA),
         where("uid", "==", uid),
         orderBy("createdAt", "desc")
-      ).withConverter(mediaConverter<Media>());
+      ).withConverter(firebaseConverter<Media>());
       const snap = await getDocs(q);
       if (snap.empty) return handleEmptyResult();
 
@@ -54,14 +70,13 @@ export const MediaService = {
 
       return { ok: true, data };
     } catch (err) {
-      console.log(err);
       return handleResultError(err);
     }
   },
 
   async addMedia(media: Media): Promise<Result<Media>> {
     try {
-      const ref = doc(collection(firestore, COLLECTIONS.MEDIA)).withConverter(mediaConverter<Media>());
+      const ref = doc(collection(firestore, COLLECTIONS.MEDIA)).withConverter(firebaseConverter<Media>());
       const mediaDoc: Media = {
         ...media,
         id: ref.id,
@@ -82,7 +97,7 @@ export const MediaService = {
         omitBy((val) => val === undefined)
       );
 
-      const ref = doc(firestore, COLLECTIONS.MEDIA, media.id).withConverter(mediaConverter<Media>());
+      const ref = doc(firestore, COLLECTIONS.MEDIA, media.id).withConverter(firebaseConverter<Media>());
       await updateDoc(ref, { ...modifiedDoc });
       return { ok: true, data: media };
     } catch (err) {

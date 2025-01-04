@@ -5,7 +5,7 @@ export const ErrorScreen = ({ message }: { message?: string }) => {
   const error = useRouteError();
 
   const getErrorMessage = () => {
-    if (isRouteErrorResponse(error)) return error.data.description;
+    if (isRouteErrorResponse(error)) return error.data;
     return message ?? "An Unknown Error Has Occurred";
   };
 

@@ -3,8 +3,6 @@ import { Button, Card, Divider, Group, Modal, rem, SimpleGrid, Stack, Text } fro
 import { useEditor } from "@tiptap/react";
 import { RichTextEditor } from "@mantine/tiptap";
 import StarterKit from "@tiptap/starter-kit";
-import { MRating, MTitle } from "@components/motion";
-import { animate } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,8 +11,15 @@ import { showErrorNotification, showSuccessNotification } from "@utils/notificat
 import { Media } from "../types/media";
 import { DataColumn } from "@components/DataColumn";
 import { toUpperCase } from "remeda";
+import { MotionRating, MotionTitle } from "@components/motion";
+import { animate } from "motion/react";
 
-export const MediaView = ({ media }: { media: Media }) => {
+interface MediaViewProps {
+  media: Media;
+  viewOnly?: boolean;
+}
+
+export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [rating, setRating] = useState(0);
@@ -63,19 +68,21 @@ export const MediaView = ({ media }: { media: Media }) => {
         {isError ? <Text>{error.message}</Text> : null}
         <Group justify="space-between">
           <Group>
-            <MTitle initial={{ opacity: 0.5 }} animate={{ opacity: 1 }} c="teal">
+            <MotionTitle initial={{ opacity: 0.5 }} animate={{ opacity: 1 }} c="teal">
               {media.title}
-            </MTitle>
-            <MRating value={rating} readOnly />
+            </MotionTitle>
+            <MotionRating value={rating} readOnly />
           </Group>
-          <Group>
-            <Button component={Link} to={`/update/${media.id}`}>
-              Update
-            </Button>
-            <Button color="red" size="sm" onClick={deleteHandlers.open}>
-              Delete
-            </Button>
-          </Group>
+          {!viewOnly && (
+            <Group>
+              <Button size="xs" component={Link} to={`/update/${media.id}`}>
+                Update
+              </Button>
+              <Button size="xs" color="red" onClick={deleteHandlers.open}>
+                Delete
+              </Button>
+            </Group>
+          )}
         </Group>
         <Divider />
         <SimpleGrid cols={2}>

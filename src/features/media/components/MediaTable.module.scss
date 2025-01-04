@@ -18,7 +18,7 @@ th {
 .row {
   cursor: pointer;
 
-  @include dark {
+  @include mantine.dark {
     background-color: var(--mantine-color-dark-6);
   }
 }
