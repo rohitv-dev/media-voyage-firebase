@@ -40,7 +40,7 @@ export const MediaService = {
       const q = query(
         collection(firestore, COLLECTIONS.MEDIA),
         where("uid", "==", friendUid),
-        orderBy("createdAt", "desc")
+        orderBy("updatedAt", "desc")
       ).withConverter(firebaseConverter<Media>());
 
       const snap = await getDocs(q);
@@ -58,7 +58,7 @@ export const MediaService = {
       const q = query(
         collection(firestore, COLLECTIONS.MEDIA),
         where("uid", "==", uid),
-        orderBy("createdAt", "desc")
+        orderBy("updatedAt", "desc")
       ).withConverter(firebaseConverter<Media>());
       const snap = await getDocs(q);
       if (snap.empty) return handleEmptyResult();

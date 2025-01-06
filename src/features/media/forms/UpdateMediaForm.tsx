@@ -45,6 +45,7 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
           const index = findIndex(old, (m) => m.id === res.data.id);
           if (index === -1) return old;
           old[index] = res.data;
+          old.unshift(old.splice(index, 1)[0]);
           return old;
         });
       }

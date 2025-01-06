@@ -79,10 +79,11 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
             Completed: "teal",
             "In Progress": "yellow",
             Planned: "grape",
+            Dropped: "red",
           };
 
           return (
-            <Pill bg={colors[info.getValue() as MediaStatus]} c="white" fw="bold">
+            <Pill bg={colors[info.getValue()]} c="white" fw="bold">
               {info.getValue()}
             </Pill>
           );

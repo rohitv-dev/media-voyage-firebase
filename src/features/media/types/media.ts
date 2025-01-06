@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const MediaStatusEnum = z.enum(["Completed", "In Progress", "Planned"]);
+export const MediaStatusEnum = z.enum(["Completed", "In Progress", "Planned", "Dropped"]);
 export type MediaStatus = z.infer<typeof MediaStatusEnum>;
 
 export const MediaTypeEnum = z.enum(["Movie", "Show", "Game", "Book"]);
