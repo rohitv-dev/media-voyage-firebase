@@ -1,4 +1,5 @@
 import {
+  and,
   collection,
   deleteDoc,
   doc,
@@ -39,7 +40,7 @@ export const MediaService = {
 
       const q = query(
         collection(firestore, COLLECTIONS.MEDIA),
-        where("uid", "==", friendUid),
+        and(where("uid", "==", friendUid), where("isPrivate", "==", false)),
         orderBy("updatedAt", "desc")
       ).withConverter(firebaseConverter<Media>());
 
@@ -49,6 +50,7 @@ export const MediaService = {
 
       return { ok: true, data };
     } catch (err) {
+      console.log(err);
       return handleResultError(err);
     }
   },

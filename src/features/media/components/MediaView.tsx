@@ -92,6 +92,7 @@ export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
           <DataColumn title="Completed Date" value={media.completedDate} />
           <DataColumn title="Platform" value={media.platform} />
           <DataColumn title="Recommended?" value={media.recommended} />
+          <DataColumn title="Private" value={media.isPrivate ? "Yes" : "No"} />
         </SimpleGrid>
         {media.comments ? (
           <Stack gap="5px">

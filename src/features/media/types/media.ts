@@ -24,4 +24,5 @@ export interface Media {
   status: MediaStatus;
   uid?: string;
   genre?: string;
+  isPrivate: boolean;
 }

@@ -1,4 +1,16 @@
-import { Button, Center, Rating, Select, SimpleGrid, Stack, Text, TextInput, Title } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Group,
+  Rating,
+  Select,
+  SimpleGrid,
+  Stack,
+  Switch,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaService } from "../api/MediaService";
@@ -19,6 +31,7 @@ const initialMediaValues: Media = {
   type: "Movie",
   updatedAt: new Date(),
   status: "Completed",
+  isPrivate: false,
 };
 
 export const AddMediaForm = () => {
@@ -75,7 +88,10 @@ export const AddMediaForm = () => {
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <Stack>
         {isError ? <Text>{error.message}</Text> : null}
-        <Title order={3}>Add Media</Title>
+        <Group justify="space-between">
+          <Title order={3}>Add Media</Title>
+          <Switch label="Private" {...form.getInputProps("isPrivate", { type: "checkbox" })} />
+        </Group>
         <TextInput withAsterisk label="Title" placeholder="Enter the title" {...form.getInputProps("title")} />
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
           <Select
