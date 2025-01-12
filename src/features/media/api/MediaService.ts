@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   orderBy,
@@ -16,13 +17,25 @@ import { firestore } from "@/services/firebase";
 import { COLLECTIONS } from "@utils/constants";
 import { Result } from "@/types/api";
 import { parseMedia } from "../utils/converters";
-import { Media } from "../types/media";
+import { Media, MediaCount, MediaStatusEnum } from "../types/media";
 import { handleEmptyResult, handleResultError } from "@utils/functions";
 import { FriendsService } from "@features/friends/api/FriendsService";
 import { firebaseConverter } from "../utils/firebaseConverters";
 
-export const MediaService = {
-  async getSingleMedia(id: string): Promise<Result<Media>> {
+type MediaService = {
+  getSingleMedia(id: string): Promise<Result<Media>>;
+  getFriendMedia(curUid: string, friendUid: string): Promise<Result<Media[]>>;
+  getMedia(uid: string): Promise<Result<Media[]>>;
+
+  addMedia(media: Media): Promise<Result<Media>>;
+  updateMedia(media: Media): Promise<Result<Media>>;
+  deleteMedia(id: string): Promise<Result<boolean>>;
+
+  getMediaCount(uid: string): Promise<Result<MediaCount>>;
+};
+
+export const MediaService: MediaService = {
+  async getSingleMedia(id) {
     try {
       const snap = await getDoc(doc(firestore, COLLECTIONS.MEDIA, id).withConverter(firebaseConverter<Media>()));
       if (snap.exists()) return { ok: true, data: parseMedia(snap.data()) };
@@ -32,7 +45,7 @@ export const MediaService = {
     }
   },
 
-  async getFriendMedia(curUid: string, friendUid: string): Promise<Result<Media[]>> {
+  async getFriendMedia(curUid, friendUid) {
     try {
       const res = await FriendsService.isFriend(curUid, friendUid);
 
@@ -55,7 +68,7 @@ export const MediaService = {
     }
   },
 
-  async getMedia(uid: string): Promise<Result<Media[]>> {
+  async getMedia(uid) {
     try {
       const q = query(
         collection(firestore, COLLECTIONS.MEDIA),
@@ -76,7 +89,7 @@ export const MediaService = {
     }
   },
 
-  async addMedia(media: Media): Promise<Result<Media>> {
+  async addMedia(media) {
     try {
       const ref = doc(collection(firestore, COLLECTIONS.MEDIA)).withConverter(firebaseConverter<Media>());
       const mediaDoc: Media = {
@@ -90,7 +103,7 @@ export const MediaService = {
     }
   },
 
-  async updateMedia(media: Media): Promise<Result<Media>> {
+  async updateMedia(media) {
     try {
       if (!media.id) return { ok: false, message: "Invalid Media ID" };
 
@@ -107,12 +120,61 @@ export const MediaService = {
     }
   },
 
-  async deleteMedia(id: string): Promise<Result<boolean>> {
+  async deleteMedia(id) {
     try {
       const res = await MediaService.getSingleMedia(id);
       if (!res.ok) return { ok: false, message: res.message };
       await deleteDoc(doc(firestore, COLLECTIONS.MEDIA, id));
       return { ok: true, data: true };
+    } catch (err) {
+      return handleResultError(err);
+    }
+  },
+
+  async getMediaCount(uid) {
+    try {
+      const [countSnap, completedSnap, inProgressSnap, plannedSnap, droppedSnap] = await Promise.all([
+        getCountFromServer(query(collection(firestore, COLLECTIONS.MEDIA), where("uid", "==", uid))),
+        getCountFromServer(
+          query(
+            collection(firestore, COLLECTIONS.MEDIA),
+            where("uid", "==", uid),
+            where("status", "==", MediaStatusEnum.Enum.Completed)
+          )
+        ),
+        getCountFromServer(
+          query(
+            collection(firestore, COLLECTIONS.MEDIA),
+            where("uid", "==", uid),
+            where("status", "==", MediaStatusEnum.Enum["In Progress"])
+          )
+        ),
+        getCountFromServer(
+          query(
+            collection(firestore, COLLECTIONS.MEDIA),
+            where("uid", "==", uid),
+            where("status", "==", MediaStatusEnum.Enum.Planned)
+          )
+        ),
+        getCountFromServer(
+          query(
+            collection(firestore, COLLECTIONS.MEDIA),
+            where("uid", "==", uid),
+            where("status", "==", MediaStatusEnum.Enum.Dropped)
+          )
+        ),
+      ]);
+
+      return {
+        ok: true,
+        data: {
+          total: countSnap.data().count,
+          completed: completedSnap.data().count,
+          inProgress: inProgressSnap.data().count,
+          planned: plannedSnap.data().count,
+          dropped: droppedSnap.data().count,
+        },
+      };
     } catch (err) {
       return handleResultError(err);
     }

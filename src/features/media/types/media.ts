@@ -26,3 +26,27 @@ export interface Media {
   genre?: string;
   isPrivate: boolean;
 }
+
+export interface CSVMedia {
+  Title: string;
+  Status: string;
+  Type: string;
+  Rating: number;
+  "Added On": string;
+  "Last Updated On": string;
+  "Started On"?: string;
+  "Completed On"?: string;
+  Platform?: string;
+  Tags: string[];
+  Genre?: string;
+  Recommended?: string;
+  Comments?: string;
+}
+
+export interface MediaCount {
+  total: number;
+  completed: number;
+  dropped: number;
+  planned: number;
+  inProgress: number;
+}

@@ -28,3 +28,16 @@ export const singleMediaQuery = (id: string) =>
       return res.data;
     },
   });
+
+export const mediaCountQuery = (uid: string) =>
+  queryOptions({
+    queryKey: ["mediaCount"],
+    queryFn: async () => {
+      const res = await MediaService.getMediaCount(uid);
+      if (!res.ok) {
+        throw new Error(res.message);
+      }
+
+      return res.data;
+    },
+  });

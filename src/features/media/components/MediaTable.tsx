@@ -38,6 +38,7 @@ import classes from "./MediaTable.module.scss";
 import { TableHeader } from "@components/table/TableHeader";
 import { IconDotsVertical, IconSearch } from "@tabler/icons-react";
 import { formatDate } from "@utils/functions";
+import { downloadCsv } from "../utils/functions";
 
 interface MediaTableProps {
   data: Media[];
@@ -225,9 +226,14 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
             setGlobalFilter(String(e.target.value));
           }}
         />
-        <Button variant="outline" size="xs" onClick={filterHandlers.open}>
-          Filters
-        </Button>
+        <Group>
+          <Button variant="outline" size="xs" color="yellow" onClick={() => downloadCsv(data)}>
+            Export
+          </Button>
+          <Button variant="outline" size="xs" onClick={filterHandlers.open}>
+            Filters
+          </Button>
+        </Group>
       </Group>
 
       <Stack hiddenFrom="sm">

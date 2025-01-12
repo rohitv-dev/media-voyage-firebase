@@ -6,6 +6,7 @@ import { useRouteLoaderData } from "react-router-dom";
 import { UserLoader } from "@features/authentication/routes/routes";
 import { ErrorScreen } from "@components/ErrorScreen";
 import { mediaQuery } from "../api/queries";
+import { MediaCountSection } from "../components/MediaCountSection";
 
 export const MediaPage = () => {
   const uid = useRouteLoaderData("root") as UserLoader;
@@ -17,6 +18,7 @@ export const MediaPage = () => {
 
   return (
     <Container>
+      <MediaCountSection />
       <MediaTable data={data} />
     </Container>
   );
