@@ -50,7 +50,7 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
 
   const { mutateAsync, isPending, isError, error } = useMutation({
     mutationFn: MediaService.updateMedia,
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       if (res.ok) {
         queryClient.setQueryData<Media[]>(["media"], (old) => {
           if (!old) return old;
@@ -59,6 +59,10 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
           old[index] = res.data;
           old.unshift(old.splice(index, 1)[0]);
           return old;
+        });
+
+        await queryClient.invalidateQueries({
+          queryKey: ["mediaCount"],
         });
       }
     },

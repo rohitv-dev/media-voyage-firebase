@@ -62,11 +62,15 @@ export const AddMediaForm = () => {
 
   const { mutateAsync, isPending, isError, error } = useMutation({
     mutationFn: MediaService.addMedia,
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       if (res.ok) {
         queryClient.setQueryData<Media[]>(["media"], (old) => {
           if (!old) return old;
           return [res.data, ...old];
+        });
+
+        await queryClient.invalidateQueries({
+          queryKey: ["mediaCount"],
         });
       }
     },

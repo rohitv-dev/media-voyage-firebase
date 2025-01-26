@@ -16,14 +16,13 @@ import {
   Button,
   Card,
   DefaultMantineColor,
+  Divider,
   Flex,
   Group,
   Menu,
-  Modal,
   Paper,
   Pill,
   Rating,
-  SimpleGrid,
   Stack,
   StyleProp,
   Table,
@@ -31,12 +30,11 @@ import {
   TextInput,
 } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
-import { useDisclosure } from "@mantine/hooks";
 import { Filter } from "@components/table/Filter";
 import { isNullish } from "remeda";
 import classes from "./MediaTable.module.scss";
 import { TableHeader } from "@components/table/TableHeader";
-import { IconDotsVertical, IconSearch } from "@tabler/icons-react";
+import { IconChevronDown, IconDotsVertical, IconSearch, IconX } from "@tabler/icons-react";
 import { formatDate } from "@utils/functions";
 import { downloadCsv } from "../utils/functions";
 
@@ -48,7 +46,6 @@ interface MediaTableProps {
 export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
   const navigate = useNavigate();
   const columnHelper = createColumnHelper<Media>();
-  const [filterOpened, filterHandlers] = useDisclosure(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -113,6 +110,7 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
         header: (ctx) => <TableHeader ctx={ctx} />,
         cell: (info) => <Rating size="xs" value={info.getValue()} readOnly />,
         enableGlobalFilter: false,
+        enableColumnFilter: false,
       }),
       columnHelper.display({
         id: "Actions",
@@ -197,7 +195,7 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
 
   return (
     <Stack gap="xs">
-      <Flex gap="sm" wrap="wrap">
+      <Flex gap="sm" wrap="wrap" mt="xs">
         {table.getAllColumns().map((col) => {
           if (col.getCanFilter()) {
             if (isNullish(col.getFilterValue())) return null;
@@ -218,6 +216,7 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
       </Flex>
       <Group justify="space-between">
         <TextInput
+          flex={1}
           leftSection={<IconSearch size={18} />}
           placeholder="Search"
           size="xs"
@@ -226,12 +225,37 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
             setGlobalFilter(String(e.target.value));
           }}
         />
-        <Group>
+        <Group gap="xs">
+          {table
+            .getAllColumns()
+            .filter((col) => col.getCanFilter())
+            .map((col) => (
+              <Menu key={col.id}>
+                <Menu.Target>
+                  <Button size="xs" variant="outline" rightSection={<IconChevronDown size={16} />}>
+                    {col.id}
+                  </Button>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Stack>
+                    <Filter column={col} table={table} />
+                    <Divider />
+                    <Group justify="end">
+                      <Button
+                        size="xs"
+                        variant="subtle"
+                        leftSection={<IconX size={16} />}
+                        onClick={() => col.setFilterValue("")}
+                      >
+                        Clear
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Menu.Dropdown>
+              </Menu>
+            ))}
           <Button variant="outline" size="xs" color="yellow" onClick={() => downloadCsv(data)}>
             Export
-          </Button>
-          <Button variant="outline" size="xs" onClick={filterHandlers.open}>
-            Filters
           </Button>
         </Group>
       </Group>
@@ -284,15 +308,6 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
           </Table>
         </Paper>
       </Stack>
-
-      <Modal opened={filterOpened} onClose={filterHandlers.close} title="Filters">
-        <SimpleGrid cols={2}>
-          {table.getAllColumns().map((col) => {
-            if (col.getCanFilter()) return <Filter key={col.id} column={col} table={table} />;
-            return null;
-          })}
-        </SimpleGrid>
-      </Modal>
     </Stack>
   );
 };
