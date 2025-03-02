@@ -55,6 +55,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         theme={{
           primaryColor: "teal",
           fontFamily: "Fira Sans",
+          white: "#f4f3ef",
           components: {
             Rating: Rating.extend({
               defaultProps: {

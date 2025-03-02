@@ -14,7 +14,6 @@ import {
   ActionIcon,
   Box,
   Button,
-  Card,
   DefaultMantineColor,
   Divider,
   Flex,
@@ -37,6 +36,7 @@ import { TableHeader } from "@components/table/TableHeader";
 import { IconChevronDown, IconDotsVertical, IconSearch, IconX } from "@tabler/icons-react";
 import { formatDate } from "@utils/functions";
 import { downloadCsv } from "../utils/functions";
+import { MediaCard } from "./MediaCard";
 
 interface MediaTableProps {
   data: Media[];
@@ -262,15 +262,7 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
 
       <Stack hiddenFrom="sm">
         {table.getRowModel().rows.map((row) => (
-          <Card key={row.id} shadow="md" radius="md">
-            <Stack gap="8px">
-              {row.getVisibleCells().map((cell) => (
-                <Group key={cell.id} grow>
-                  <Box>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Box>
-                </Group>
-              ))}
-            </Stack>
-          </Card>
+          <MediaCard key={row.id} media={row.original} />
         ))}
       </Stack>
 

@@ -33,10 +33,11 @@ export const MediaCountSection = () => {
         <Text>{error.message}</Text>
       </Group>
     );
+
   if (isPending)
     return (
       <Group grow>
-        <Skeleton />
+        <Skeleton h={20} />
       </Group>
     );
 

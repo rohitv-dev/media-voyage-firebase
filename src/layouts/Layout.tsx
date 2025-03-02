@@ -76,7 +76,7 @@ export const Layout = () => {
         </Stack>
       </AppShell.Navbar>
       <AppShell.Main>
-        <Container py="md">
+        <Container py="md" px="xs">
           <Outlet />
         </Container>
       </AppShell.Main>

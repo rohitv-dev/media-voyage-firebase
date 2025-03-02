@@ -1,46 +1,50 @@
-import { Card, Stack, Group, Rating, Button, Text, DefaultMantineColor, StyleProp } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
-import { Media } from "../types/media";
+import { Card, Stack, Group, Button, Text, DefaultMantineColor, StyleProp, Divider, Box, Pill } from "@mantine/core";
+import { Link } from "react-router-dom";
+import { Media, MediaStatus } from "../types/media";
+import { IconStarFilled, IconEye, IconEdit } from "@tabler/icons-react";
 import { formatDate } from "@utils/functions";
 
+const colors: Record<MediaStatus, StyleProp<DefaultMantineColor>> = {
+  Completed: "teal",
+  "In Progress": "yellow",
+  Planned: "grape",
+  Dropped: "red",
+};
+
 export const MediaCard = ({ media }: { media: Media }) => {
-  const navigate = useNavigate();
-
-  const getColor = (status: string): StyleProp<DefaultMantineColor> => {
-    if (status === "Completed") return "teal";
-    if (status === "In Progress") return "cyan";
-    return "lime";
-  };
-
   return (
-    <Card key={media.title} withBorder shadow="md" radius="md" bg={getColor(media.status)} c="white">
-      <Stack gap="xs">
+    <Card shadow="md" radius="md">
+      <Stack gap="xs" w="100%">
         <Group justify="space-between">
-          <Text fw="bold" fz="lg">
-            {media.title}
-          </Text>
-          <Rating value={media.rating} readOnly />
+          <Group>
+            <Text fw="bold" fz="md">
+              {media.title}
+            </Text>
+            <Pill size="xs" bg={colors[media.status]} fw="bold" c="white">
+              {media.status}
+            </Pill>
+          </Group>
+          <Group gap="xs">
+            {media.rating}
+            <IconStarFilled size={16} color="orange" />
+          </Group>
         </Group>
-        <Text fw="600">{media.status}</Text>
+
+        <Stack gap="1px">
+          <Text fz="xs">{media.type}</Text>
+          <Box h={5}></Box>
+          <Group justify="space-between">
+            <Text fz="xs">Added On: {formatDate(media.createdAt)}</Text>
+          </Group>
+        </Stack>
+
+        <Divider color="gray" />
+
         <Group>
-          <Text fw="600">Added On: </Text>
-          {<Text>{formatDate(media.createdAt)}</Text>}
-        </Group>
-        <Group>
-          <Button
-            variant="white"
-            onClick={() => {
-              navigate(`view/${media.id}`);
-            }}
-          >
+          <Button size="xs" leftSection={<IconEye size={18} />} component={Link} to={`./view/${media.id}`} color="blue">
             View
           </Button>
-          <Button
-            variant="white"
-            onClick={() => {
-              navigate(`update/${media.id}`, { state: { media } });
-            }}
-          >
+          <Button size="xs" leftSection={<IconEdit size={18} />} component={Link} to={`./update/${media.id}`}>
             Update
           </Button>
         </Group>

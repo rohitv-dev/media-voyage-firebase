@@ -1,5 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Card, Divider, Group, Modal, rem, SimpleGrid, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Divider,
+  Group,
+  Modal,
+  rem,
+  SimpleGrid,
+  Stack,
+  Text,
+  useMantineColorScheme,
+} from "@mantine/core";
 import { useEditor } from "@tiptap/react";
 import { RichTextEditor } from "@mantine/tiptap";
 import StarterKit from "@tiptap/starter-kit";
@@ -24,6 +35,7 @@ export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
   const queryClient = useQueryClient();
   const [rating, setRating] = useState(0);
   const [deleteOpened, deleteHandlers] = useDisclosure(false);
+  const { colorScheme } = useMantineColorScheme();
 
   const { mutateAsync, isPending, isError, error } = useMutation({
     mutationFn: MediaService.deleteMedia,
@@ -63,7 +75,7 @@ export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
   };
 
   return (
-    <Card>
+    <Card shadow={colorScheme === "dark" ? "sm" : "lg"}>
       <Stack gap="sm">
         {isError ? <Text>{error.message}</Text> : null}
         <Group justify="space-between">
