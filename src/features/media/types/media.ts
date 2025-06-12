@@ -1,12 +1,10 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const MediaStatusEnum = z.enum(["Completed", "In Progress", "Planned", "Dropped"]);
 export type MediaStatus = z.infer<typeof MediaStatusEnum>;
 
 export const MediaTypeEnum = z.enum(["Movie", "Show", "Game", "Book"]);
 export type MediaType = z.infer<typeof MediaTypeEnum>;
-
-// TODO: No special characters in Genre, Platform
 
 export interface Media {
   id?: string;

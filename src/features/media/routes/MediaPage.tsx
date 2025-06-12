@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Container } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { MediaTable } from "../components/MediaTable";
 import { LoadingScreen } from "@components/LoadingScreen";
 import { useRouteLoaderData } from "react-router-dom";
@@ -17,9 +17,9 @@ export const MediaPage = () => {
   if (isError) return <ErrorScreen message={error.message} />;
 
   return (
-    <Container>
+    <Box>
       <MediaCountSection />
       <MediaTable data={data} />
-    </Container>
+    </Box>
   );
 };

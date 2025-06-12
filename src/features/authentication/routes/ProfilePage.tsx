@@ -5,6 +5,7 @@ import { Avatar, Card, Center, Stack, Text } from "@mantine/core";
 import { formatDate } from "@utils/functions";
 import { isString } from "remeda";
 import { FriendsCard } from "@features/friends/components/FriendsCard";
+import { DATE_WITH_TIME } from "@utils/constants";
 
 export const ProfilePage = () => {
   const id = useRouteLoaderData("root") as UserLoader;
@@ -23,7 +24,7 @@ export const ProfilePage = () => {
               {user.name}
             </Text>
             <Text>{user.email}</Text>
-            <Text>Registered on {formatDate(user.createdAt, true)}</Text>
+            <Text>Registered on {formatDate(user.createdAt, DATE_WITH_TIME)}</Text>
           </Stack>
         </Card>
         <FriendsCard />

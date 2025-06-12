@@ -1,52 +1,22 @@
-import {
-  Button,
-  Center,
-  Group,
-  Rating,
-  Select,
-  SimpleGrid,
-  Stack,
-  Switch,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { Center, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaService } from "../api/MediaService";
-import { useForm, zodResolver } from "@mantine/form";
+import { Media, MediaStatusEnum, MediaTypeEnum } from "../types/media";
 import { useNavigate } from "react-router-dom";
 import { CommentsEditor } from "../components/CommentsEditor";
 import { useInputState } from "@mantine/hooks";
-import { Media, MediaStatusEnum, MediaTypeEnum } from "../types/media";
-import { mediaSchema } from "../utils/schema";
+import { UpdateMediaSchema, updateMediaSchema } from "../utils/schema";
 import { showErrorNotification, showSuccessNotification } from "@utils/notifications";
 import { findIndex } from "remeda";
+import { useAppForm } from "@components/form/form";
+import { formatDate } from "@utils/functions";
+import { YYYYMMDD } from "@utils/constants";
 
 export const UpdateMediaForm = ({ media }: { media: Media }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [comments, setComments] = useInputState(media.comments ?? "");
-
-  const form = useForm<Media>({
-    initialValues: structuredClone(media),
-    validate: zodResolver(mediaSchema),
-    enhanceGetInputProps: (payload) => {
-      const { status } = payload.form.values;
-
-      if (payload.field === "completedDate") {
-        if (status === "Completed")
-          return {
-            withAsterisk: true,
-          };
-
-        return {
-          withAsterisk: false,
-        };
-      }
-    },
-  });
 
   const { mutateAsync, isPending, isError, error } = useMutation({
     mutationFn: MediaService.updateMedia,
@@ -71,73 +41,107 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
     },
   });
 
-  const handleSubmit = async (values: Media) => {
-    const res = await mutateAsync({ ...values, comments });
-    if (res.ok) {
-      showSuccessNotification("Updated Media Succesffully");
-      navigate("../");
-    } else showErrorNotification(res.message);
-  };
+  const { AppField, AppForm, SubmitButton, Subscribe, handleSubmit, validateField } = useAppForm({
+    defaultValues: structuredClone({
+      ...media,
+      startDate: media.startDate ? formatDate(media.startDate, YYYYMMDD) : undefined,
+      completedDate: media.completedDate ? formatDate(media.completedDate, YYYYMMDD) : undefined,
+    }) as UpdateMediaSchema,
+    validators: {
+      onSubmit: updateMediaSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const result = updateMediaSchema.parse(value);
+      const res = await mutateAsync({ ...result, comments });
+      if (res.ok) {
+        showSuccessNotification("Updated Media Succesffully");
+        navigate("../");
+      } else showErrorNotification(res.message);
+    },
+  });
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
-      <Stack>
-        {isError ? <Text>{error.message}</Text> : null}
-        <Group justify="space-between">
-          <Title order={3}>Update Media</Title>
-          <Switch label="Private" {...form.getInputProps("isPrivate", { type: "checkbox" })} />
-        </Group>
-        <TextInput withAsterisk label="Title" placeholder="Enter the title" {...form.getInputProps("title")} />
-        <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          <Select
-            label="Media Type"
-            placeholder="Select Media Type"
-            data={MediaTypeEnum.options}
-            {...form.getInputProps("type")}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+    >
+      <AppForm>
+        <Stack>
+          {isError ? <Text>{error.message}</Text> : null}
+          <Group justify="space-between">
+            <Title order={3}>Update Media</Title>
+            <AppField name="isPrivate" children={({ SwitchField }) => <SwitchField label="Private" />} />
+          </Group>
+          <AppField
+            name="title"
+            children={({ TextField }) => <TextField withAsterisk placeholder="Enter the title" />}
           />
-          <TextInput label="Genre" placeholder="Enter the genre" {...form.getInputProps("genre")} />
-        </SimpleGrid>
-        <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          <DateInput
-            clearable
-            label="Start Date"
-            placeholder="Enter the start date"
-            {...form.getInputProps("startDate")}
+          <SimpleGrid cols={{ base: 1, sm: 2 }}>
+            <AppField
+              name="type"
+              children={({ SelectField }) => (
+                <SelectField label="Media Type" placeholder="Select Media Type" data={MediaTypeEnum.options} />
+              )}
+            />
+            <AppField name="genre" children={({ TextField }) => <TextField placeholder="Enter the genre" />} />
+          </SimpleGrid>
+          <SimpleGrid cols={{ base: 1, sm: 2 }}>
+            <AppField
+              name="startDate"
+              children={({ DateField }) => (
+                <DateField highlightToday clearable label="Start Date" placeholder="Enter the start date" />
+              )}
+            />
+            <Subscribe
+              selector={(state) => state.values.status}
+              children={(status) => (
+                <AppField
+                  name="completedDate"
+                  children={({ DateField }) => (
+                    <DateField
+                      withAsterisk={status === "Completed"}
+                      highlightToday
+                      clearable
+                      label="Completed Date"
+                      placeholder="Enter the completed date"
+                    />
+                  )}
+                />
+              )}
+            />
+          </SimpleGrid>
+          <AppField
+            listeners={{
+              onChange: () => {
+                validateField("completedDate", "change");
+              },
+            }}
+            name="status"
+            children={({ SelectField }) => (
+              <SelectField withAsterisk label="Status" placeholder="Status" data={MediaStatusEnum.options} />
+            )}
           />
-          <DateInput
-            clearable
-            label="Completed Date"
-            placeholder="Enter the completed date"
-            {...form.getInputProps("completedDate")}
-          />
-        </SimpleGrid>
-        <Select
-          withAsterisk
-          label="Status"
-          placeholder="Status"
-          data={MediaStatusEnum.options}
-          {...form.getInputProps("status")}
-        />
-        <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          <TextInput label="Platform" placeholder="Enter the platform" {...form.getInputProps("platform")} />
-          <Select
-            label="Recommended"
-            data={["Yes", "No"]}
-            placeholder="Yes/No"
-            {...form.getInputProps("recommended")}
-          />
-        </SimpleGrid>
-        <Stack gap="5px">
-          <Text fw="600">Comments</Text>
-          <CommentsEditor comments={comments} setComments={setComments} />
+          <SimpleGrid cols={{ base: 1, sm: 2 }}>
+            <AppField name="platform" children={({ TextField }) => <TextField placeholder="Enter the platform" />} />
+            <AppField
+              name="recommended"
+              children={({ SelectField }) => (
+                <SelectField withAsterisk label="Recommended" placeholder="Yes/No" data={["Yes", "No"]} />
+              )}
+            />
+          </SimpleGrid>
+          <Stack gap="5px">
+            <Text fw="600">Comments</Text>
+            <CommentsEditor comments={comments} setComments={setComments} />
+          </Stack>
+          <Center>
+            <AppField name="rating" children={({ RatingField }) => <RatingField size="xl" />} />
+          </Center>
+          <SubmitButton loading={isPending}>Submit</SubmitButton>
         </Stack>
-        <Center>
-          <Rating size="xl" {...form.getInputProps("rating")} />
-        </Center>
-        <Button type="submit" loading={isPending}>
-          Submit
-        </Button>
-      </Stack>
+      </AppForm>
     </form>
   );
 };

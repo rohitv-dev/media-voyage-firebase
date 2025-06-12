@@ -3,3 +3,6 @@ export const COLLECTIONS = {
   FRIENDS: "friends",
   USERS: "users",
 };
+
+export const DATE_WITH_TIME = "DD/MM/YYYY hh:mm a";
+export const YYYYMMDD = "YYYY-MM-DD";

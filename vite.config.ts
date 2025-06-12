@@ -27,6 +27,8 @@ export default defineConfig(({ mode }) => ({
       "@components": "/src/components",
       "@utils": "/src/utils",
       "@features": "/src/features",
+      // FIXME - Temporary fix for the tabler icons dev issue
+      "@tabler/icons-react": "@tabler/icons-react/dist/esm/icons/index.mjs",
     },
   },
 }));

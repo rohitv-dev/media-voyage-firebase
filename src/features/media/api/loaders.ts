@@ -5,7 +5,6 @@ import { find } from "remeda";
 import { Media } from "../types/media";
 import { singleMediaQuery } from "./queries";
 
-export type MediaLoader = Awaited<ReturnType<ReturnType<typeof mediaLoader>>>;
 export type SingleMediaLoader = Awaited<ReturnType<ReturnType<typeof singleMediaLoader>>>;
 
 export const singleMediaLoader =
@@ -32,14 +31,4 @@ export const singleMediaLoader =
     queryClient.setQueryData(["media", params.id], selectedMedia);
 
     return params.id;
-  };
-
-const mediaLoader =
-  (queryClient: QueryClient) =>
-  async ({ params }: LoaderFunctionArgs) => {
-    if (!params.id) {
-      throw new Error("Media ID Not Provided");
-    }
-    await queryClient.ensureQueryData(singleMediaQuery(params.id));
-    return { id: params.id };
   };

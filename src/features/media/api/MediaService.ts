@@ -27,7 +27,7 @@ type MediaService = {
   getFriendMedia(curUid: string, friendUid: string): Promise<Result<Media[]>>;
   getMedia(uid: string): Promise<Result<Media[]>>;
 
-  addMedia(media: Media): Promise<Result<Media>>;
+  addMedia(uid: string, media: Media): Promise<Result<Media>>;
   updateMedia(media: Media): Promise<Result<Media>>;
   deleteMedia(id: string): Promise<Result<boolean>>;
 
@@ -89,11 +89,13 @@ export const MediaService: MediaService = {
     }
   },
 
-  async addMedia(media) {
+  async addMedia(uid, media) {
     try {
       const ref = doc(collection(firestore, COLLECTIONS.MEDIA)).withConverter(firebaseConverter<Media>());
       const mediaDoc: Media = {
         ...media,
+        uid,
+
         id: ref.id,
       };
       await setDoc(ref, mediaDoc);
@@ -133,36 +135,18 @@ export const MediaService: MediaService = {
 
   async getMediaCount(uid) {
     try {
+      const queries = [
+        MediaStatusEnum.enum.Completed,
+        MediaStatusEnum.enum["In Progress"],
+        MediaStatusEnum.enum.Planned,
+        MediaStatusEnum.enum.Dropped,
+      ].map((val) =>
+        query(collection(firestore, COLLECTIONS.MEDIA), where("uid", "==", uid), where("status", "==", val))
+      );
+
       const [countSnap, completedSnap, inProgressSnap, plannedSnap, droppedSnap] = await Promise.all([
         getCountFromServer(query(collection(firestore, COLLECTIONS.MEDIA), where("uid", "==", uid))),
-        getCountFromServer(
-          query(
-            collection(firestore, COLLECTIONS.MEDIA),
-            where("uid", "==", uid),
-            where("status", "==", MediaStatusEnum.Enum.Completed)
-          )
-        ),
-        getCountFromServer(
-          query(
-            collection(firestore, COLLECTIONS.MEDIA),
-            where("uid", "==", uid),
-            where("status", "==", MediaStatusEnum.Enum["In Progress"])
-          )
-        ),
-        getCountFromServer(
-          query(
-            collection(firestore, COLLECTIONS.MEDIA),
-            where("uid", "==", uid),
-            where("status", "==", MediaStatusEnum.Enum.Planned)
-          )
-        ),
-        getCountFromServer(
-          query(
-            collection(firestore, COLLECTIONS.MEDIA),
-            where("uid", "==", uid),
-            where("status", "==", MediaStatusEnum.Enum.Dropped)
-          )
-        ),
+        ...queries.map((q) => getCountFromServer(q)),
       ]);
 
       return {

@@ -18,6 +18,6 @@ export const getDate = (date: Timestamp | Date): Date => {
   return date.toDate();
 };
 
-export const formatDate = (date: Date | Dayjs, withTime: boolean = false): string => {
-  return dayjs(date).format(withTime ? "DD/MM/YYYY hh:mm a" : "DD/MM/YYYY");
+export const formatDate = (date: Date | Dayjs, format = "DD/MM/YYYY"): string => {
+  return dayjs(date).format(format);
 };

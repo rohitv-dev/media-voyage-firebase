@@ -87,6 +87,18 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
           );
         },
       }),
+      columnHelper.accessor("genre", {
+        id: "Genre",
+        header: () => "Genre",
+        cell: (info) => info.getValue() ?? "",
+        enableColumnFilter: false,
+      }),
+      columnHelper.accessor("platform", {
+        id: "Platform",
+        header: () => "Platform",
+        cell: (info) => info.getValue() ?? "",
+        enableColumnFilter: false,
+      }),
       columnHelper.accessor("createdAt", {
         id: "Added On",
         header: (ctx) => <TableHeader ctx={ctx} />,
