@@ -1,12 +1,13 @@
-import { Anchor, Card, Center, Container, Stack, Title } from "@mantine/core";
+import { Card, Center, Container, Stack, Title } from "@mantine/core";
 import { z } from "zod";
 import { AuthService } from "../api/AuthService";
-import { Link, Navigate } from "react-router-dom";
 import { showErrorNotification } from "@utils/notifications";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { LoadingScreen } from "@components/LoadingScreen";
 import { useState } from "react";
 import { useAppForm } from "@components/form/form";
+import { Navigate } from "@tanstack/react-router";
+import { Anchor } from "@components/Anchor";
 
 export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export const LoginPage = () => {
   if (authLoading) return <LoadingScreen />;
 
   if (isLoggedIn) {
-    return <Navigate to="../" />;
+    return <Navigate to="/media" />;
   }
 
   return (
@@ -55,7 +56,7 @@ export const LoginPage = () => {
                 <AppField name="email" children={({ TextField }) => <TextField />} />
                 <AppField name="password" children={({ PasswordField }) => <PasswordField />} />
                 <SubmitButton loading={loading}>Login</SubmitButton>
-                <Anchor component={Link} to="/register" style={{ textAlign: "center" }}>
+                <Anchor to="/register" style={{ textAlign: "center" }}>
                   Don't have an account yet? Register!
                 </Anchor>
               </Stack>

@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
-import { MediaService } from "./MediaService";
 import { ErrorInfo } from "@/types/api";
+import { MediaService } from "../api/MediaService";
 
 export const mediaQuery = (uid: string) =>
   queryOptions({

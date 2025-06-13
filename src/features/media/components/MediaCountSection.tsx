@@ -1,8 +1,7 @@
 import { Group, Pill, Skeleton, Text } from "@mantine/core";
-import { mediaCountQuery } from "../api/queries";
 import { useQuery } from "@tanstack/react-query";
-import { UserLoader } from "@features/authentication/routes/routes";
-import { useRouteLoaderData } from "react-router-dom";
+import { useRouteContext } from "@tanstack/react-router";
+import { mediaCountQuery } from "../queries/mediaQueries";
 
 // interface CountCardProps extends CardProps {
 //   title: string;
@@ -23,9 +22,11 @@ import { useRouteLoaderData } from "react-router-dom";
 // };
 
 export const MediaCountSection = () => {
-  const uid = useRouteLoaderData("root") as UserLoader;
+  const {
+    auth: { user },
+  } = useRouteContext({ from: "/_protected/media/" });
 
-  const { data, isPending, isError, error } = useQuery(mediaCountQuery(String(uid)));
+  const { data, isPending, isError, error } = useQuery(mediaCountQuery(user!.uid));
 
   if (isError)
     return (

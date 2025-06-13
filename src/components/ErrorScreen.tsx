@@ -1,11 +1,7 @@
 import { Card, Stack, Title, Text } from "@mantine/core";
-import { isRouteErrorResponse, useRouteError } from "react-router-dom";
 
 export const ErrorScreen = ({ message }: { message?: string }) => {
-  const error = useRouteError();
-
   const getErrorMessage = () => {
-    if (isRouteErrorResponse(error)) return error.data;
     return message ?? "An Unknown Error Has Occurred";
   };
 

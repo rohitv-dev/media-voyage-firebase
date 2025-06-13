@@ -2,13 +2,13 @@ import { Center, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaService } from "../api/MediaService";
 import { Media, MediaStatusEnum, MediaTypeEnum } from "../types/media";
-import { useNavigate } from "react-router-dom";
 import { CommentsEditor } from "../components/CommentsEditor";
 import { useInputState } from "@mantine/hooks";
 import { addMediaSchema, AddMediaSchema } from "../utils/schema";
 import { showErrorNotification, showSuccessNotification } from "@utils/notifications";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { useAppForm } from "@components/form/form";
+import { useNavigate } from "@tanstack/react-router";
 
 export const AddMediaForm = () => {
   const navigate = useNavigate();
@@ -69,7 +69,7 @@ export const AddMediaForm = () => {
 
       if (res.ok) {
         showSuccessNotification("Added Media Succesffully");
-        navigate("../");
+        navigate({ to: "/media" });
       } else showErrorNotification(res.message);
     },
   });
@@ -96,7 +96,12 @@ export const AddMediaForm = () => {
             <AppField
               name="type"
               children={({ SelectField }) => (
-                <SelectField label="Media Type" placeholder="Select Media Type" data={MediaTypeEnum.options} />
+                <SelectField
+                  withAsterisk
+                  label="Media Type"
+                  placeholder="Select Media Type"
+                  data={MediaTypeEnum.options}
+                />
               )}
             />
             <AppField name="genre" children={({ TextField }) => <TextField placeholder="Enter the genre" />} />

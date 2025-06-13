@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { FriendsService } from "./FriendsService";
+import { FriendsService } from "../api/FriendsService";
 import { MediaService } from "@features/media/api/MediaService";
 import { ErrorInfo } from "@/types/api";
 

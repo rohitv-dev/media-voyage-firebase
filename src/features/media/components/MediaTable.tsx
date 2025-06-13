@@ -28,7 +28,6 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { Link, useNavigate } from "react-router-dom";
 import { Filter } from "@components/table/Filter";
 import { isNullish } from "remeda";
 import classes from "./MediaTable.module.scss";
@@ -37,6 +36,7 @@ import { IconChevronDown, IconDotsVertical, IconSearch, IconX } from "@tabler/ic
 import { formatDate } from "@utils/functions";
 import { downloadCsv } from "../utils/functions";
 import { MediaCard } from "./MediaCard";
+import { useNavigate, useParams } from "@tanstack/react-router";
 
 interface MediaTableProps {
   data: Media[];
@@ -44,6 +44,7 @@ interface MediaTableProps {
 }
 
 export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
+  const { name } = useParams({ strict: false });
   const navigate = useNavigate();
   const columnHelper = createColumnHelper<Media>();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -146,20 +147,19 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
                 </Menu.Target>
                 <Menu.Dropdown>
                   <Menu.Item
-                    component={Link}
-                    to={`view/${id}`}
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (viewOnly && name) navigate({ to: "/friend/$name/media/view/$id", params: { id: id!, name } });
+                      else navigate({ to: "/media/view/$id", params: { id: id! } });
                     }}
                   >
                     View
                   </Menu.Item>
                   {!viewOnly && (
                     <Menu.Item
-                      component={Link}
-                      to={`update/${id}`}
                       onClick={(e) => {
                         e.stopPropagation();
+                        navigate({ to: "/media/update/$id", params: { id: id! } });
                       }}
                     >
                       Update
@@ -168,10 +168,23 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
                 </Menu.Dropdown>
               </Menu>
               <Group grow hiddenFrom="sm">
-                <Button component={Link} to={`view/${id}`} size="xs" variant="light">
+                <Button
+                  size="xs"
+                  variant="light"
+                  onClick={() => {
+                    if (viewOnly && name) navigate({ to: "/friend/$name/media/view/$id", params: { id: id!, name } });
+                    else navigate({ to: "/media/view/$id", params: { id: id! } });
+                  }}
+                >
                   View
                 </Button>
-                <Button component={Link} to={`update/${id}`} size="xs" variant="light">
+                <Button
+                  size="xs"
+                  variant="light"
+                  onClick={() => {
+                    navigate({ to: "/media/update/$id", params: { id: id! } });
+                  }}
+                >
                   Update
                 </Button>
               </Group>
@@ -182,7 +195,7 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
         enableColumnFilter: false,
       }),
     ],
-    [columnHelper, viewOnly]
+    [columnHelper, navigate, viewOnly, name]
   );
 
   const table = useReactTable({
@@ -298,7 +311,9 @@ export const MediaTable = ({ data, viewOnly }: MediaTableProps) => {
                   key={row.id}
                   className={classes.row}
                   onClick={() => {
-                    navigate(`view/${row.original.id}`);
+                    if (viewOnly && name)
+                      navigate({ to: "/friend/$name/media/view/$id", params: { id: row.original.id!, name } });
+                    else navigate({ to: "/media/view/$id", params: { id: row.original.id! } });
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

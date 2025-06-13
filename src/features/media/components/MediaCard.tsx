@@ -1,8 +1,8 @@
 import { Card, Stack, Group, Button, Text, DefaultMantineColor, StyleProp, Divider, Box, Pill } from "@mantine/core";
-import { Link } from "react-router-dom";
 import { Media, MediaStatus } from "../types/media";
 import { IconStarFilled, IconEye, IconEdit } from "@tabler/icons-react";
 import { formatDate } from "@utils/functions";
+import { useNavigate } from "@tanstack/react-router";
 
 const colors: Record<MediaStatus, StyleProp<DefaultMantineColor>> = {
   Completed: "teal",
@@ -12,6 +12,8 @@ const colors: Record<MediaStatus, StyleProp<DefaultMantineColor>> = {
 };
 
 export const MediaCard = ({ media }: { media: Media }) => {
+  const navigate = useNavigate();
+
   return (
     <Card shadow="md" radius="md">
       <Stack gap="xs" w="100%">
@@ -41,10 +43,16 @@ export const MediaCard = ({ media }: { media: Media }) => {
         <Divider color="gray" />
 
         <Group>
-          <Button size="xs" leftSection={<IconEye size={18} />} component={Link} to={`./view/${media.id}`} color="blue">
+          <Button size="xs" leftSection={<IconEye size={18} />} color="blue">
             View
           </Button>
-          <Button size="xs" leftSection={<IconEdit size={18} />} component={Link} to={`./update/${media.id}`}>
+          <Button
+            size="xs"
+            leftSection={<IconEdit size={18} />}
+            onClick={() => {
+              navigate({ to: "/media/update/$id", params: { id: media.id! } });
+            }}
+          >
             Update
           </Button>
         </Group>

@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { FriendsService } from "../api/FriendsService";
-import { UserLoader, userQuery } from "@features/authentication/routes/routes";
-import { findIndex, isString } from "remeda";
+import { userQuery } from "@features/authentication/queries/authQueries";
+import { findIndex } from "remeda";
 import { useDisclosure } from "@mantine/hooks";
-import { Link, useRouteLoaderData } from "react-router-dom";
 import { ErrorScreen } from "@components/ErrorScreen";
 import {
   Card,
@@ -22,15 +21,16 @@ import {
 import { IconCheck, IconLoader, IconPlus, IconUser, IconX } from "@tabler/icons-react";
 import { AddFriendForm } from "./AddFriendForm";
 import { DBFriendWithUser } from "../types/friends";
-import { friendsWithUserQuery } from "../api/queries";
+import { friendsWithUserQuery } from "../queries/friendQueries";
+import { useNavigate, useRouteContext } from "@tanstack/react-router";
 
 export const FriendsCard = () => {
+  const { auth } = useRouteContext({ from: "/_protected" });
+  const navigate = useNavigate();
   const [opened, handlers] = useDisclosure(false);
   const queryClient = useQueryClient();
 
-  const id = useRouteLoaderData("root") as UserLoader;
-
-  const { data: user } = useSuspenseQuery(userQuery(isString(id) ? id : ""));
+  const { data: user } = useSuspenseQuery(userQuery(auth.user!.uid));
 
   const { data: friends, isPending, isError, error } = useQuery(friendsWithUserQuery(user.uid));
 
@@ -69,7 +69,7 @@ export const FriendsCard = () => {
 
   const activeFriends = friends.filter((f) => f.status === "Friends");
   const pendingRequests = friends.filter((f) => f.status === "Pending" && f.recepient === user.uid);
-  const rejectedRequests = friends.filter((f) => f.status === "Rejected" && f.recepient === id);
+  const rejectedRequests = friends.filter((f) => f.status === "Rejected" && f.recepient === auth.user!.uid);
 
   return (
     <Box>
@@ -94,7 +94,11 @@ export const FriendsCard = () => {
               <List.Item key={friend.id}>
                 <Group>
                   <Text>{friend.user.name}</Text>
-                  <Button size="xs" variant="light" component={Link} to={`../friend/${friend.user.name}/media`}>
+                  <Button
+                    size="xs"
+                    variant="light"
+                    onClick={() => navigate({ to: "/friend/$name/media", params: { name: friend.user.name } })}
+                  >
                     View Media
                   </Button>
                 </Group>

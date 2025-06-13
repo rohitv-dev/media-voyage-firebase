@@ -2,7 +2,6 @@ import { Center, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaService } from "../api/MediaService";
 import { Media, MediaStatusEnum, MediaTypeEnum } from "../types/media";
-import { useNavigate } from "react-router-dom";
 import { CommentsEditor } from "../components/CommentsEditor";
 import { useInputState } from "@mantine/hooks";
 import { UpdateMediaSchema, updateMediaSchema } from "../utils/schema";
@@ -11,6 +10,7 @@ import { findIndex } from "remeda";
 import { useAppForm } from "@components/form/form";
 import { formatDate } from "@utils/functions";
 import { YYYYMMDD } from "@utils/constants";
+import { useNavigate } from "@tanstack/react-router";
 
 export const UpdateMediaForm = ({ media }: { media: Media }) => {
   const navigate = useNavigate();
@@ -55,7 +55,7 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
       const res = await mutateAsync({ ...result, comments });
       if (res.ok) {
         showSuccessNotification("Updated Media Succesffully");
-        navigate("../");
+        navigate({ to: "/media/view/$id", params: { id: media.id! } });
       } else showErrorNotification(res.message);
     },
   });
@@ -82,7 +82,12 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
             <AppField
               name="type"
               children={({ SelectField }) => (
-                <SelectField label="Media Type" placeholder="Select Media Type" data={MediaTypeEnum.options} />
+                <SelectField
+                  withAsterisk
+                  label="Media Type"
+                  placeholder="Select Media Type"
+                  data={MediaTypeEnum.options}
+                />
               )}
             />
             <AppField name="genre" children={({ TextField }) => <TextField placeholder="Enter the genre" />} />

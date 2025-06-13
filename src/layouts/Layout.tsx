@@ -1,3 +1,6 @@
+import { useAuthContext } from "@/context/authContext";
+import { HeaderDropdown } from "@components/navigation/HeaderDropdown";
+import { userQuery } from "@features/authentication/queries/authQueries";
 import {
   AppShell,
   Burger,
@@ -10,21 +13,19 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { IconMoon, IconSun } from "@tabler/icons-react";
-import { UserLoader, userQuery } from "@features/authentication/routes/routes";
-import { HeaderDropdown } from "@components/navigation/HeaderDropdown";
-import { isString } from "remeda";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { ReactNode } from "react";
 
-export const Layout = () => {
-  const id = useLoaderData() as UserLoader;
+export const Layout = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuthContext();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+
+  const { data } = useSuspenseQuery(userQuery(user!.uid));
 
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure();
-
-  const { data } = useSuspenseQuery(userQuery(isString(id) ? id : ""));
 
   return (
     <AppShell
@@ -35,15 +36,29 @@ export const Layout = () => {
         <Group h="100%" justify="space-between">
           <Group>
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-            <Title order={3} style={{ userSelect: "none", cursor: "pointer" }} onClick={() => navigate("")}>
+            <Title
+              order={3}
+              style={{ userSelect: "none", cursor: "pointer" }}
+              onClick={() => navigate({ to: "/media" })}
+            >
               Media Voyage
             </Title>
           </Group>
           <Group justify="end" visibleFrom="sm">
-            <Button component={Link} to="" variant="light">
+            <Button
+              variant="light"
+              onClick={() => {
+                navigate({ to: "/media" });
+              }}
+            >
               Home
             </Button>
-            <Button component={Link} to="add" variant="light">
+            <Button
+              variant="light"
+              onClick={() => {
+                navigate({ to: "/media/add" });
+              }}
+            >
               Add
             </Button>
             <ActionIcon size="lg" onClick={toggleColorScheme}>
@@ -57,27 +72,33 @@ export const Layout = () => {
       <AppShell.Navbar p="md">
         <Stack justify="space-between" h="100%">
           <Stack>
-            <Button component={Link} to="" variant="light" onClick={toggle}>
+            <Button variant="light" onClick={toggle}>
               Home
             </Button>
-            <Button component={Link} to="/add" variant="light" onClick={toggle}>
+            <Button
+              variant="light"
+              onClick={() => {
+                navigate({ to: "/media/add" });
+                toggle();
+              }}
+            >
               Add
             </Button>
-            <Button component={Link} to="/profile" variant="light" onClick={toggle}>
+            <Button variant="light" onClick={toggle}>
               Profile
             </Button>
             <Button variant="outline" onClick={toggleColorScheme}>
               {colorScheme === "dark" ? "Light Mode" : "Dark Mode"}
             </Button>
           </Stack>
-          <Button component={Link} to="/logout" variant="light" color="red" onClick={toggle}>
+          <Button variant="light" color="red" onClick={toggle}>
             Logout
           </Button>
         </Stack>
       </AppShell.Navbar>
       <AppShell.Main>
         <Container size="xl" py="md" px={{ base: "xs", md: "md" }}>
-          <Outlet />
+          {children}
         </Container>
       </AppShell.Main>
     </AppShell>

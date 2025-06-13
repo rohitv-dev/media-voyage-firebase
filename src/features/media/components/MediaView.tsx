@@ -1,4 +1,3 @@
-import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -24,6 +23,7 @@ import { DataColumn } from "@components/DataColumn";
 import { toUpperCase } from "remeda";
 import { MotionRating, MotionTitle } from "@components/motion";
 import { animate } from "motion/react";
+import { useNavigate } from "@tanstack/react-router";
 
 interface MediaViewProps {
   media: Media;
@@ -69,7 +69,7 @@ export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
     const res = await mutateAsync(media.id);
     if (res.ok) {
       showSuccessNotification("Deleted Media Successfully");
-      navigate("/");
+      navigate({ to: "/media" });
     } else showErrorNotification(res.message);
     deleteHandlers.close();
   };
@@ -87,7 +87,12 @@ export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
           </Group>
           {!viewOnly && (
             <Group>
-              <Button size="xs" component={Link} to={`/update/${media.id}`}>
+              <Button
+                size="xs"
+                onClick={() => {
+                  navigate({ to: "/media/update/$id", params: { id: media.id! } });
+                }}
+              >
                 Update
               </Button>
               <Button size="xs" color="red" onClick={deleteHandlers.open}>
