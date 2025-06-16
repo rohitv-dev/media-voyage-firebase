@@ -21,17 +21,18 @@ export const AddMediaForm = () => {
     mutationFn: async ({ uid, media }: { uid: string; media: Media }) => {
       return await MediaService.addMedia(uid, media);
     },
-    onSuccess: async (res) => {
-      if (res.ok) {
-        queryClient.setQueryData<Media[]>(["media"], (old) => {
-          if (!old) return old;
-          return [res.data, ...old];
-        });
+    onSuccess: async (data) => {
+      queryClient.setQueryData<Media[]>(["media"], (old) => {
+        if (!old) return old;
+        return [data, ...old];
+      });
 
-        await queryClient.invalidateQueries({
-          queryKey: ["mediaCount"],
-        });
-      }
+      showSuccessNotification("Added Media Succesffully");
+      navigate({ to: "/media" });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["mediaCount"],
+      });
     },
     onError: (res) => {
       showErrorNotification(res.message);
@@ -62,15 +63,10 @@ export const AddMediaForm = () => {
         comments,
       };
 
-      const res = await mutateAsync({
+      mutateAsync({
         uid: user.uid,
         media,
       });
-
-      if (res.ok) {
-        showSuccessNotification("Added Media Succesffully");
-        navigate({ to: "/media" });
-      } else showErrorNotification(res.message);
     },
   });
 
@@ -147,7 +143,7 @@ export const AddMediaForm = () => {
             <AppField
               name="recommended"
               children={({ SelectField }) => (
-                <SelectField withAsterisk label="Recommended" placeholder="Yes/No" data={["Yes", "No"]} />
+                <SelectField label="Recommended" placeholder="Yes/No" data={["Yes", "No"]} />
               )}
             />
           </SimpleGrid>

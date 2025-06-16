@@ -1,70 +1,69 @@
-import { auth } from "@/services/firebase";
-import { User } from "@/types/user";
 import { UserService } from "@features/authentication/api/UserService";
-import { Button, Group, Stack, TextInput } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 import { showErrorNotification, showSuccessNotification } from "@utils/notifications";
-import { useState } from "react";
 import { FriendsService } from "../api/FriendsService";
+import { useAuthContext } from "@/context/authContext";
+import { auth } from "@/services/firebase";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { userQuery } from "@features/authentication/queries/authQueries";
+import { useAppForm } from "@components/form/form";
 
 export const AddFriendForm = ({ closeForm }: { closeForm: () => void }) => {
-  const [text, setText] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  const authCtx = useAuthContext();
+  const { data: userData } = useSuspenseQuery(userQuery(authCtx.user!.uid));
 
-  const fetchUser = async () => {
-    const res = await UserService.searchUser(text);
+  const { AppForm, AppField, SubmitButton, handleSubmit } = useAppForm({
+    defaultValues: {
+      text: "",
+    },
+    onSubmit: async ({ value }) => {
+      const user = await UserService.searchUser(value.text);
 
-    if (res.ok) {
-      setUser(res.data);
-      showSuccessNotification("User Found, click on Send Request to send a friend request");
-    } else {
-      showErrorNotification(res.message);
-    }
-  };
+      if (user) {
+        const currentUser = auth.currentUser;
 
-  const sendRequest = async () => {
-    const currentUser = auth.currentUser;
+        if (currentUser && authCtx.user) {
+          const isFriend = await FriendsService.isFriend(currentUser.uid, user.uid);
 
-    if (user && currentUser) {
-      const isFriendRes = await FriendsService.isFriend(currentUser.uid, user.uid);
+          if (isFriend) {
+            showErrorNotification("You are already friends with this user, or you may have been rejected. Sad.");
+            return;
+          }
 
-      if (!isFriendRes.ok) {
-        showErrorNotification(isFriendRes.message);
-        return;
+          await FriendsService.sendRequest({ curUid: currentUser.uid, otherUid: user.uid, username: userData.name });
+
+          showSuccessNotification("Friend Request Sent");
+          closeForm();
+        }
+      } else {
+        showErrorNotification("User Not Found");
       }
-
-      if (isFriendRes.data) {
-        showErrorNotification("You are already friends with this user, or you may have been rejected. Sad.");
-        return;
-      }
-
-      const res = await FriendsService.sendRequest(currentUser.uid, user.uid);
-
-      if (res.ok) {
-        showSuccessNotification("Friend Request Sent");
-        closeForm();
-      } else showErrorNotification(res.message);
-    }
-  };
+    },
+  });
 
   return (
-    <>
-      <Stack>
-        <TextInput
-          label="Name/Email"
-          placeholder="Search for user by name or email"
-          leftSection={<IconSearch />}
-          onChange={(e) => setText(e.currentTarget.value)}
-        />
-        <Group grow>
-          <Button variant="outline" onClick={fetchUser}>
-            Fetch User
-          </Button>
-          <Button onClick={sendRequest} disabled={!user}>
-            Send Request
-          </Button>
-        </Group>
-      </Stack>
-    </>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+    >
+      <AppForm>
+        <Stack>
+          <AppField
+            name="text"
+            children={({ TextField }) => (
+              <TextField
+                label="Name/Email"
+                placeholder="Search for user by name or email"
+                leftSection={<IconSearch />}
+              />
+            )}
+          />
+          <SubmitButton>Send Request</SubmitButton>
+        </Stack>
+      </AppForm>
+    </form>
   );
 };

@@ -9,10 +9,6 @@ export const handleResultError = <T>(err: unknown): Result<T> => {
   return { ok: false, message: `${err}` };
 };
 
-export const handleEmptyResult = <T>(): Result<T[]> => {
-  return { ok: true, data: [] };
-};
-
 export const getDate = (date: Timestamp | Date): Date => {
   if (isDate(date)) return date;
   return date.toDate();

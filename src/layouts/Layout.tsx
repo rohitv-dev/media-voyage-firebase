@@ -1,6 +1,7 @@
 import { useAuthContext } from "@/context/authContext";
 import { HeaderDropdown } from "@components/navigation/HeaderDropdown";
 import { userQuery } from "@features/authentication/queries/authQueries";
+import { NotificationsView } from "@features/notifications/components/NotificationsView";
 import {
   AppShell,
   Burger,
@@ -53,6 +54,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             >
               Home
             </Button>
+
             <Button
               variant="light"
               onClick={() => {
@@ -61,6 +63,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             >
               Add
             </Button>
+            <NotificationsView />
             <ActionIcon size="lg" onClick={toggleColorScheme}>
               {colorScheme === "dark" ? <IconSun /> : <IconMoon />}
             </ActionIcon>

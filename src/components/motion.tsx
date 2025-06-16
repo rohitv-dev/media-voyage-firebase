@@ -6,5 +6,5 @@ import { forwardRef } from "react";
 const AnimatedRating = forwardRef<HTMLDivElement, any>((props, ref) => <Rating ref={ref} {...props} />);
 const AnimatedTitle = forwardRef<HTMLDivElement, any>((props, ref) => <Title ref={ref} {...props} />);
 
-export const MotionTitle = motion.create(AnimatedTitle);
-export const MotionRating = motion.create(AnimatedRating);
+export const MotionTitle: any = motion.create(AnimatedTitle);
+export const MotionRating: any = motion.create(AnimatedRating);

@@ -1,13 +1,14 @@
 import { Card, Center, Container, Stack, Title } from "@mantine/core";
 import { z } from "zod";
 import { AuthService } from "../api/AuthService";
-import { showErrorNotification } from "@utils/notifications";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { LoadingScreen } from "@components/LoadingScreen";
 import { useState } from "react";
 import { useAppForm } from "@components/form/form";
 import { Navigate } from "@tanstack/react-router";
 import { Anchor } from "@components/Anchor";
+import { showErrorNotification } from "@utils/notifications";
+import { FirebaseError } from "firebase/app";
 
 export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -26,11 +27,14 @@ export const LoginPage = () => {
     },
     onSubmit: async ({ value }) => {
       setLoading(true);
-      const res = await AuthService.login(value.email.trim(), value.password.trim());
-      if (!res.ok) {
-        showErrorNotification(res.message);
+      try {
+        await AuthService.login(value.email.trim(), value.password.trim());
+      } catch (err) {
+        if (err instanceof FirebaseError) showErrorNotification(err.message);
+        else showErrorNotification(`${err}`);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     },
   });
 

@@ -22,10 +22,11 @@ import { IconCheck, IconLoader, IconPlus, IconUser, IconX } from "@tabler/icons-
 import { AddFriendForm } from "./AddFriendForm";
 import { DBFriendWithUser } from "../types/friends";
 import { friendsWithUserQuery } from "../queries/friendQueries";
-import { useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { useAuthContext } from "@/context/authContext";
 
 export const FriendsCard = () => {
-  const { auth } = useRouteContext({ from: "/_protected" });
+  const auth = useAuthContext();
   const navigate = useNavigate();
   const [opened, handlers] = useDisclosure(false);
   const queryClient = useQueryClient();
@@ -36,31 +37,27 @@ export const FriendsCard = () => {
 
   const { mutateAsync: acceptRequest } = useMutation({
     mutationFn: FriendsService.acceptRequest,
-    onSuccess: (res) => {
-      if (res.ok) {
-        queryClient.setQueryData<DBFriendWithUser[]>(["friends"], (old) => {
-          if (!old) return old;
-          const index = findIndex(old, (f) => f.id === res.data);
-          if (index === -1) return old;
-          old[index] = { ...old[index], status: "Friends" };
-          return old;
-        });
-      }
+    onSuccess: (data) => {
+      queryClient.setQueryData<DBFriendWithUser[]>(["friends"], (old) => {
+        if (!old) return old;
+        const index = findIndex(old, (f) => f.id === data);
+        if (index === -1) return old;
+        old[index] = { ...old[index], status: "Friends" };
+        return old;
+      });
     },
   });
 
   const { mutateAsync: rejectRequest } = useMutation({
     mutationFn: FriendsService.rejectRequest,
-    onSuccess: (res) => {
-      if (res.ok) {
-        queryClient.setQueryData<DBFriendWithUser[]>(["friends"], (old) => {
-          if (!old) return old;
-          const index = findIndex(old, (f) => f.id === res.data);
-          if (index === -1) return old;
-          old[index] = { ...old[index], status: "Rejected" };
-          return old;
-        });
-      }
+    onSuccess: (data) => {
+      queryClient.setQueryData<DBFriendWithUser[]>(["friends"], (old) => {
+        if (!old) return old;
+        const index = findIndex(old, (f) => f.id === data);
+        if (index === -1) return old;
+        old[index] = { ...old[index], status: "Rejected" };
+        return old;
+      });
     },
   });
 
@@ -125,7 +122,7 @@ export const FriendsCard = () => {
                           color="green"
                           variant="transparent"
                           size="sm"
-                          onClick={() => acceptRequest(friend.id)}
+                          onClick={() => acceptRequest({ id: friend.id, friendId: friend.user.uid, user })}
                         >
                           <IconCheck />
                         </ActionIcon>
@@ -164,7 +161,7 @@ export const FriendsCard = () => {
                           color="green"
                           variant="transparent"
                           size="sm"
-                          onClick={() => acceptRequest(friend.id)}
+                          onClick={() => acceptRequest({ id: friend.id, friendId: friend.user.uid, user })}
                         >
                           <IconCheck />
                         </ActionIcon>

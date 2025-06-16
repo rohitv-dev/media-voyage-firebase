@@ -18,23 +18,28 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
 
   const [comments, setComments] = useInputState(media.comments ?? "");
 
-  const { mutateAsync, isPending, isError, error } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: MediaService.updateMedia,
-    onSuccess: async (res) => {
-      if (res.ok) {
-        queryClient.setQueryData<Media[]>(["media"], (old) => {
-          if (!old) return old;
-          const index = findIndex(old, (m) => m.id === res.data.id);
-          if (index === -1) return old;
-          old[index] = res.data;
-          old.unshift(old.splice(index, 1)[0]);
-          return old;
-        });
+    onSuccess: async (data) => {
+      queryClient.setQueryData<Media[]>(["media"], (old) => {
+        if (!old) return old;
+        const index = findIndex(old, (m) => m.id === data.id);
+        if (index === -1) return old;
+        old[index] = data;
+        old.unshift(old.splice(index, 1)[0]);
+        return old;
+      });
 
-        await queryClient.invalidateQueries({
-          queryKey: ["mediaCount"],
-        });
-      }
+      showSuccessNotification("Updated Media Succesffully");
+      navigate({ to: "/media" });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["media", media.id],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["mediaCount"],
+      });
     },
     onError: (res) => {
       showErrorNotification(res.message);
@@ -52,11 +57,7 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
     },
     onSubmit: async ({ value }) => {
       const result = updateMediaSchema.parse(value);
-      const res = await mutateAsync({ ...result, comments });
-      if (res.ok) {
-        showSuccessNotification("Updated Media Succesffully");
-        navigate({ to: "/media/view/$id", params: { id: media.id! } });
-      } else showErrorNotification(res.message);
+      mutateAsync({ ...result, comments });
     },
   });
 
@@ -69,7 +70,6 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
     >
       <AppForm>
         <Stack>
-          {isError ? <Text>{error.message}</Text> : null}
           <Group justify="space-between">
             <Title order={3}>Update Media</Title>
             <AppField name="isPrivate" children={({ SwitchField }) => <SwitchField label="Private" />} />
@@ -133,7 +133,7 @@ export const UpdateMediaForm = ({ media }: { media: Media }) => {
             <AppField
               name="recommended"
               children={({ SelectField }) => (
-                <SelectField withAsterisk label="Recommended" placeholder="Yes/No" data={["Yes", "No"]} />
+                <SelectField label="Recommended" placeholder="Yes/No" data={["Yes", "No"]} />
               )}
             />
           </SimpleGrid>

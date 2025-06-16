@@ -1,13 +1,14 @@
 import { Card, Center, Container, Stack, Title } from "@mantine/core";
 import { z } from "zod";
 import { AuthService } from "../api/AuthService";
-import { showErrorNotification } from "@utils/notifications";
 import { LoadingScreen } from "@components/LoadingScreen";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { useState } from "react";
 import { useAppForm } from "@components/form/form";
 import { Navigate, useNavigate } from "@tanstack/react-router";
 import { Anchor } from "@components/Anchor";
+import { showErrorNotification } from "@utils/notifications";
+import { FirebaseError } from "firebase/app";
 
 export const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
@@ -36,17 +37,20 @@ export const RegisterPage = () => {
     },
     onSubmit: async ({ value }) => {
       setLoading(true);
-      const res = await AuthService.register({
-        name: value.name.trim(),
-        email: value.email.trim(),
-        password: value.password.trim(),
-      });
-      if (res.ok) {
+      try {
+        await AuthService.register({
+          name: value.name.trim(),
+          email: value.email.trim(),
+          password: value.password.trim(),
+        });
+
         navigate({ to: "/media" });
-      } else {
-        showErrorNotification(res.message);
+      } catch (err) {
+        if (err instanceof FirebaseError) showErrorNotification(err.message);
+        showErrorNotification(`${err}`);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     },
   });
 

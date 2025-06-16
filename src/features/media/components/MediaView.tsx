@@ -41,6 +41,9 @@ export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
     mutationFn: MediaService.deleteMedia,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["media"] });
+      deleteHandlers.close();
+      showSuccessNotification("Deleted Media Successfully");
+      navigate({ to: "/media" });
     },
     onError: (res) => {
       showErrorNotification(res.message);
@@ -66,12 +69,7 @@ export const MediaView = ({ media, viewOnly }: MediaViewProps) => {
 
   const handleDelete = async () => {
     if (!media.id) return;
-    const res = await mutateAsync(media.id);
-    if (res.ok) {
-      showSuccessNotification("Deleted Media Successfully");
-      navigate({ to: "/media" });
-    } else showErrorNotification(res.message);
-    deleteHandlers.close();
+    await mutateAsync(media.id);
   };
 
   return (
